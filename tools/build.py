@@ -4,7 +4,6 @@
   shinnecock.tpl.html + encoded.txt  ->  ../index.html
 
 Run from this folder:  python3 build.py
-Regenerate encoded.txt first with make_table.py if you are extending the dates.
 """
 import pathlib
 
@@ -31,7 +30,7 @@ head = head.replace('"Archivo",sans-serif',
 FOOT = """</section>
 
   <footer class="foot">
-    <span>Shinnecock Gate Clock v1 &middot; tide table 1&nbsp;Sep&nbsp;2026 &ndash; 31&nbsp;Dec&nbsp;2028</span>
+    <span>The Locks v2 &middot; tide table 1&nbsp;Sep&nbsp;2026 &ndash; 31&nbsp;Dec&nbsp;2028</span>
     <span id="swstate">Checking device storage&hellip;</span>
   </footer>
 
@@ -94,7 +93,7 @@ SHELL = """<!doctype html>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Gate Clock">
+<meta name="apple-mobile-web-app-title" content="The Locks">
 {head}
 {extra}
 </head>
