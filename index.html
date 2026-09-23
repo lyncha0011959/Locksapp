@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Predicts when the Shinnecock Canal tide gates are open or closed, from NOAA Sandy Hook high water. Works with no signal.">
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#E6ECEE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07131A" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="./icons/favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="./icons/icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Gate Clock">
+<title>Shinnecock Gate Clock</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#E6ECEE;
+  --card:#F4F7F8;
+  --sunk:#DAE3E6;
+  --ink:#0C1D25;
+  --ink-2:#3D5560;
+  --ink-3:#6B838D;
+  --rule:#C2D0D5;
+  --rule-2:#AEC0C6;
+  --run:#B3095F;
+  --run-ink:#8A0549;
+  --run-wash:#F7DDEA;
+  --lock:#0B6E4B;
+  --lock-ink:#0A5C3F;
+  --lock-wash:#D6EBE1;
+  --accent:#2C6079;
+  --focus:#2C6079;
+  --shadow:0 1px 2px rgba(12,29,37,.08), 0 6px 18px -10px rgba(12,29,37,.28);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#07131A;
+    --card:#0E212B;
+    --sunk:#0A1A22;
+    --ink:#E4EEF2;
+    --ink-2:#A2B7C0;
+    --ink-3:#71888F;
+    --rule:#1D3844;
+    --rule-2:#2A4C5B;
+    --run:#FF5CA8;
+    --run-ink:#FF8AC1;
+    --run-wash:#2A0D1E;
+    --lock:#3DD69A;
+    --lock-ink:#6FE5B6;
+    --lock-wash:#06251A;
+    --accent:#7FC2DE;
+    --focus:#7FC2DE;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -12px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#07131A;
+  --card:#0E212B;
+  --sunk:#0A1A22;
+  --ink:#E4EEF2;
+  --ink-2:#A2B7C0;
+  --ink-3:#71888F;
+  --rule:#1D3844;
+  --rule-2:#2A4C5B;
+  --run:#FF5CA8;
+  --run-ink:#FF8AC1;
+  --run-wash:#2A0D1E;
+  --lock:#3DD69A;
+  --lock-ink:#6FE5B6;
+  --lock-wash:#06251A;
+  --accent:#7FC2DE;
+  --focus:#7FC2DE;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -12px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 56px;display:flex;flex-direction:column;gap:18px}
+
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+}
+
+/* ---------- masthead ---------- */
+.masthead{display:flex;flex-direction:column;gap:5px;padding-bottom:14px;border-bottom:1px solid var(--rule)}
+.masthead h1{
+  font-family:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:800;font-size:clamp(25px,7.2vw,33px);
+  letter-spacing:-.022em;line-height:1.02;margin:0;text-wrap:balance;
+}
+.masthead .sub{color:var(--ink-3);font-size:11px}
+.masthead .sub b{color:var(--ink-2);font-weight:500}
+
+/* ---------- state hero ---------- */
+.hero{
+  border-radius:3px;overflow:hidden;box-shadow:var(--shadow);
+  border:1px solid var(--rule);background:var(--card);
+}
+.hero .band{height:5px;background:var(--st)}
+.hero .body{padding:17px 18px 18px;display:flex;flex-direction:column;gap:11px}
+.hero .top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hero .eyebrow{color:var(--st)}
+.hero .mode{
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.hero h2{
+  font-family:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:800;font-size:clamp(29px,9vw,40px);
+  line-height:1;letter-spacing:-.03em;margin:0;color:var(--st);text-wrap:balance;
+}
+.hero p{margin:0;color:var(--ink-2);font-size:14px;max-width:46ch}
+.hero .dirs{display:flex;flex-direction:column;gap:5px;padding-top:3px}
+.hero .dir{display:flex;gap:9px;align-items:baseline;font-size:12.5px;color:var(--ink-2)}
+.hero .dir b{
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);min-width:74px;font-weight:500;flex:none;
+}
+
+.clockrow{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
+  margin-top:3px;padding-top:13px;border-top:1px dashed var(--rule-2);
+}
+.clockrow .lab{color:var(--ink-3);display:block;margin-bottom:2px}
+.clockrow .big{
+  font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:26px;
+  letter-spacing:-.02em;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;
+}
+.clockrow .at{text-align:right}
+.clockrow .at .big{font-size:19px;color:var(--st)}
+
+.flag{
+  display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:2px;
+  background:var(--run-wash);color:var(--run-ink);font-size:12px;line-height:1.35;
+  border-left:3px solid var(--run);
+}
+.flag.mute{background:var(--sunk);color:var(--ink-2);border-left-color:var(--rule-2)}
+
+/* ---------- section shell ---------- */
+.sec{display:flex;flex-direction:column;gap:11px}
+.sec > .eyebrow{color:var(--ink-3)}
+.sechead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+/* ---------- day strip ---------- */
+.strip{
+  background:var(--card);border:1px solid var(--rule);border-radius:3px;
+  padding:15px 15px 11px;display:flex;flex-direction:column;gap:9px;box-shadow:var(--shadow);
+}
+.stripnav{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.stripnav .day{font-family:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:600;font-size:14px;letter-spacing:-.01em}
+.stripnav .btns{display:flex;gap:6px}
+button{font:inherit;cursor:pointer}
+.nav{
+  width:30px;height:26px;display:grid;place-items:center;padding:0;
+  background:var(--sunk);color:var(--ink-2);border:1px solid var(--rule);border-radius:2px;
+  font-size:12px;line-height:1;
+}
+.nav:hover{border-color:var(--rule-2);color:var(--ink)}
+.nav:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+
+.track{position:relative;height:34px;border-radius:2px;overflow:hidden;background:var(--sunk)}
+.seg{position:absolute;top:0;bottom:0}
+.seg.open{background:var(--run)}
+.seg.closed{background:var(--lock)}
+.hw{position:absolute;top:0;bottom:0;width:1px;background:var(--paper);opacity:.85}
+.nowline{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);box-shadow:0 0 0 1.5px var(--card)}
+.nowline::after{
+  content:"";position:absolute;left:50%;top:-3px;transform:translateX(-50%);
+  border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--ink);
+}
+.axis{position:relative;height:15px}
+.axis span{
+  position:absolute;top:0;transform:translateX(-50%);
+  font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--ink-3);white-space:nowrap;
+}
+.hwrow{display:flex;flex-wrap:wrap;gap:5px 14px;padding-top:2px}
+.hwrow span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3)}
+.hwrow b{color:var(--ink-2);font-weight:500}
+.key{display:flex;gap:15px;flex-wrap:wrap;padding-top:4px;border-top:1px solid var(--rule)}
+.key i{display:flex;align-items:center;gap:6px;font-style:normal;font-size:11px;color:var(--ink-2)}
+.key i::before{content:"";width:11px;height:11px;border-radius:2px;background:var(--k);flex:none}
+
+/* ---------- transitions ---------- */
+.tl{display:flex;flex-direction:column;border:1px solid var(--rule);border-radius:3px;overflow:hidden;background:var(--card)}
+.tl .row{
+  display:grid;grid-template-columns:8px 1fr auto;align-items:center;gap:12px;
+  padding:11px 14px 11px 12px;border-top:1px solid var(--rule);
+}
+.tl .row:first-child{border-top:none}
+.tl .row .pip{width:8px;height:8px;border-radius:50%;background:var(--st)}
+.tl .row .what{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tl .row .what b{font-weight:600;font-size:13.5px;color:var(--st)}
+.tl .row .what span{font-size:11px;color:var(--ink-3)}
+.tl .row .when{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+.tl .row .when small{display:block;font-size:9.5px;color:var(--ink-3);letter-spacing:.01em}
+
+/* ---------- lookup ---------- */
+.lookup{
+  background:var(--card);border:1px solid var(--rule);border-radius:3px;
+  padding:15px;display:flex;flex-direction:column;gap:11px;
+}
+.lookup .ctl{display:flex;gap:8px;flex-wrap:wrap}
+input[type="datetime-local"]{
+  flex:1 1 200px;min-width:0;font:inherit;font-family:"IBM Plex Mono",monospace;font-size:13px;
+  padding:9px 10px;background:var(--paper);color:var(--ink);
+  border:1px solid var(--rule-2);border-radius:2px;
+}
+input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outline-offset:0;border-color:var(--focus)}
+.btn{
+  padding:9px 14px;background:var(--accent);color:var(--paper);border:1px solid var(--accent);
+  border-radius:2px;font-size:13px;font-weight:600;
+}
+.btn.ghost{background:transparent;color:var(--ink-2);border-color:var(--rule-2)}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* ---------- notes ---------- */
+.notes{
+  background:var(--sunk);border:1px solid var(--rule);border-radius:3px;padding:15px 16px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.notes h3{
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);margin:0;
+}
+.notes dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:12.5px}
+.notes dt{
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3);padding-top:2px;
+}
+.notes dd{margin:0;color:var(--ink-2)}
+.notes dd b{color:var(--ink);font-weight:600}
+.notes p{margin:0;font-size:12px;color:var(--ink-2);line-height:1.55}
+.notes .warn{color:var(--run-ink);font-weight:500}
+.notes a{color:var(--accent)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<style>
+/* --- standalone / PWA additions (not present in the hosted artifact) --- */
+:root{color-scheme:light dark}
+html,body{margin:0;padding:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+.foot{
+  display:flex;flex-direction:column;gap:3px;padding-top:14px;margin-top:2px;
+  border-top:1px solid var(--rule);
+  font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:10px;letter-spacing:.04em;color:var(--ink-3);
+}
+.foot #swstate{color:var(--ink-2)}
+.foot #swstate.ready::before{content:"\2713\00a0"}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>Shinnecock Gate Clock</h1>
+    <div class="sub">
+      Tide gates &amp; lock &middot; Hampton Bays, NY &middot; <b>Peconic&nbsp;Bay ↔ Shinnecock&nbsp;Bay</b><br>
+      Predicted from NOAA high water at <b>Sandy Hook, NJ &mdash; station 8531680</b>
+    </div>
+  </header>
+
+  <section class="hero" id="hero">
+    <div class="band"></div>
+    <div class="body">
+      <div class="top">
+        <span class="eyebrow" id="heroEyebrow">&mdash;</span>
+        <span class="mode" id="heroMode">Live</span>
+      </div>
+      <h2 id="heroTitle">&mdash;</h2>
+      <p id="heroDesc"></p>
+      <div class="dirs" id="heroDirs"></div>
+      <div class="clockrow">
+        <div>
+          <span class="eyebrow lab" id="clockLab">Changes in</span>
+          <span class="big" id="clockBig">&mdash;</span>
+        </div>
+        <div class="at">
+          <span class="eyebrow lab" id="atLab">At</span>
+          <span class="big" id="atBig">&mdash;</span>
+        </div>
+      </div>
+      <div id="heroFlag"></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <span class="eyebrow">Day view</span>
+    <div class="strip">
+      <div class="stripnav">
+        <span class="day" id="stripDay">&mdash;</span>
+        <span class="btns">
+          <button class="nav" id="dayPrev" aria-label="Previous day">◀</button>
+          <button class="nav" id="dayNext" aria-label="Next day">▶</button>
+        </span>
+      </div>
+      <div class="track" id="track"></div>
+      <div class="axis" id="axis"></div>
+      <div class="hwrow" id="hwrow"></div>
+      <div class="key">
+        <i style="--k:var(--run)">Gates open &mdash; current running</i>
+        <i style="--k:var(--lock)">Gates closed &mdash; lock passage</i>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <span class="eyebrow">Next changes</span>
+    <div class="tl" id="timeline"></div>
+  </section>
+
+  <section class="sec">
+    <span class="eyebrow">Check another time</span>
+    <div class="lookup">
+      <div class="ctl">
+        <input type="datetime-local" id="pick" aria-label="Date and time to check">
+        <button class="btn" id="go">Check</button>
+        <button class="btn ghost" id="live">Back to now</button>
+      </div>
+      <p style="margin:0;font-size:11.5px;color:var(--ink-3)">
+        All times are canal local time (Eastern). Predictions run through <b id="coverEnd">&mdash;</b>.
+      </p>
+    </div>
+  </section>
+
+  <section class="notes">
+    <h3>Notes to mariners</h3>
+    <dl>
+      <dt>Rule</dt>
+      <dd>Gates <b>close 3 h 30 m before</b> Sandy Hook high water and <b>open 2 h 30 m after</b> &mdash; a closed window of six hours, then roughly 6 h 25 m open.</dd>
+      <dt>Source</dt>
+      <dd>NOAA CO&#8209;OPS harmonic tide predictions, ft MLLW, station 8531680. 1,648 high waters embedded &mdash; the app needs no signal.</dd>
+      <dt>On scene</dt>
+      <dd>Lock operator monitors <b>VHF 13</b> &middot; <b>631&#8209;852&#8209;8299</b>. Three horn blasts to request the lock; green light to proceed.</dd>
+    </dl>
+    <p class="warn">This is a prediction, not an observation. Wind and storm surge shift real tides by an hour or more, and mechanical failure or county maintenance overrides the schedule entirely &mdash; the canal has closed to all traffic on short notice before.</p>
+    <p>Not for navigation. Confirm on scene or by radio before committing to the cut. Predictions have not been verified against logged gate operations; treat the timing as approximate and widen your margin near a transition.</p>
+  </section>
+
+  <footer class="foot">
+    <span>Shinnecock Gate Clock v1 &middot; tide table 1&nbsp;Sep&nbsp;2026 &ndash; 31&nbsp;Dec&nbsp;2028</span>
+    <span id="swstate">Checking device storage&hellip;</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- embedded tide table ---------- */
+var T0 = 29803844;
+var ENC = "001ekp1jkq1ckq1jkw19kr1il018kr1il117kr1il618ks1il61akr1jl21dkl1lky1hki1nku1kkg1nkt1mkf1mkt1mke1jks1lkf1gks1kkh1ckr1hkk19kr1fko16kp1dkr14kn1bku13km1akx13km1al113kl1bl116ki1dkx19kf1fks1cke1hko1gkf1ikl1jkh1jkj1lkl1ikh1nkp1gki1nku1ekj1ml01bkl1ll719kl1jl818km1hl718km1hl71akn1gl71ckl1hl31gkj1ikx1jkg1jkt1mkg1jkp1nkg1hko1nkh1fkm1mkj1dkj1kkn1aki1hkr17kh1eky15kf1cl313ke1al412kc19l413kc19l514kd19l517kf1bl11akg1cku1eki1eko1jkk1gkk1mkn1gkh1pks1gkf1qkw1fkg1pl01dkh1ol71bkh1llc1aki1ilb19kh1gl91akh1fl71ckh1el71eki1dl31gkh1dky1ikh1dkr1kkh1dkn1lkj1ckj1lkl1bkg1kko19ke1ikq17kc1fkw15k91dl313k61bla12k419lb12k418l913k517l614k817l517ke17l21akk18kx1eko1akp1jks1bkk1nkt1cki1pkw1dkg1qkz1dkh1pl31ckg1nl81bkg1klb1akf1hlb1ake1el81bkd1cl71ckc19l71cke17l51dkh16ky1fkk16kq1gkl16kl1hkm16kh1hko16kf1gkp15kc1fks14ka1dkv13k61bl112k31al611k018l912k117l813k415l515k915l317kg14l01akp14kz1dkw14ks1hky16kn1kky18kk1nkx1akj1okz1bki1nl11ckh1ll41ckg1il71bke1fl71bkd1bl61bkb18l51akc14l01akf12l319kj10l019kn10kt1ako10km1bkp12ki1cko13kf1dkp13kd1ckq13ka1ckr13k71aku13k519kw13k417ky14k715l015kc13kz16kj12kx18kp11kw19kx10kx1bl311kv1el314kp1hkz17km1kkx1akk1mkw1dki1mky1ekg1kl01fkf1hl11eke1dl21dke19l21bke15l019kf11ky17kj0zky16ko0xky15kt0xkt16kt0yko17kq10ki19kp12kf1bko14kd1bkn15kc1bkm16kb1akm17kb19km17kd17km18kj15ko18kp13kp19kv11kq19kz10ks1al410kt1al911ku1cl514kq1fkz19km1ikw1dkj1kkv1gkh1kku1ikh1ikv1hkg1fkv1gkh1bkv1eki17ku1bkl13kt18kn10kr16kp0ykr14kt0xkt13ky0xks14ky0zkn16kt12ki18kp14kg1akm17kf1bkk19kf1cki1bkh1bkf1ckk1akd1dkp18kd1dku16kf1dl214kh1cl713kj1cl912kl1bla12ko1bla14kq1cl618ko1el01dkl1gku1hkj1iks1kki1ikr1lki1gkp1kkj1dko1ikm1akm1fkp17kl1cku14kj19kx11kj17ky10ki15kz0zkj14l310kk14l312kk16ky15ki17kr18kh19km1bki1bkh1ekl1cke1hko1ckb1ikt1bk91jky19k91jl518ka1ilb16kc1glf16ke1eld16kg1dlb17kh1dlb1akj1cl81dkk1dl11hkj1ekv1kkj1fkq1mkj1ekn1mkl1dkk1lko1bkh1jkr19ke1hkw16kd1el114kb1bl513ka18l612k917l512k916l513kb16l515ke16l218ki17kv1bkk18kn1fko1akg1jkr1bkd1mkv1cka1nl01ck91ol41bk91nla1ak91llf1akb1jlf1akc1hlc1bkc1fla1dkd1dl91fkf1cl71hki1bl21jkj1bkv1lkk1bko1mkn1bkj1mkp1akg1lkr19kd1jku18ka1hkz16k81el415k41cla15k21alb14k018l915k217l616k417l518ka16l21bki16ky1ekq17kp1ikv18ki1lky1ake1ol01bkc1ql31ckb1ql61dkc1pl91dkb1nld1eka1lld1fkb1ila1gka1gl81hkb1dl71hkc1al61ikh18l21ikl17kv1jko17kn1jkp18ki1kkr18ke1jkt18kb1ikv18k91hky17k51fl217k21dl716jy1bl917jy1al918jz18l519k517l11bkc16kz1dkm15kw1gkx15ks1il217km1ml219ki1pl11ckg1rl11ekf1rl41gkd1rl61hkd1pl81ikc1ml91ikb1il81jka1fl61ikb1bl41hke18l21gkj16l01gko15kv1gkr15ko1hkr16ki1hkr17ke1iks18kc1iks19k91hku19k61gkx19k31eky19k11cl01ak31al01ak718kz1cke17kw1dkl16kv1fkt15ku1gl215kt1jl717kp1ml41akk1pl11eki1rkz1ikg1sl01kkf1rl11mkf1ol21mke1ll41lke1hl31kkf1dl11ikh19ky1gkj16kx1fkn14kw1dkt14kt1dkv14kn1ekt16ki1gkr18ke1hkq1akc1hkp1ckb1hkp1dk91gko1dk91ekn1dkb1ckm1ekf1akn1ekm18ko1ekt17kq1fky16kp1gl315kp1hl816kr1il919kp1ll41ekl1okz1iki1qkx1mkh1qkw1pkg1pkx1pkg1nkx1okh1jkx1mkj1fkx1kkl1bkv1hko18ks1fkq15kr1dkt14kq1ckw14kq1cky15km1dkv18kh1ekr1bkf1gko1dke1hkm1fkd1hkj1hkf1gkg1hki1ekd1ikm1ckc1iks1akd1il018kg1hl717ki1glb16kj1gla17kl1hla19km1ila1ckm1jl41hkk1mky1mki1nkv1pkh1nkt1rki1mks1rki1jkr1pkl1gkq1mko1ckp1jkt19ko1fkw16km1dkx15kk1bky14kj1al015kj1al116ki1akz19kg1ckt1ckg1dkn1fkh1ekj1iki1ekf1jkl1ekc1lkp1dk91lkv1bk81ll11ak91kla18kb1ilg17ke1hlg17ke1glc19kg1gla1ckh1gla1fki1gl51jkj1hky1nkj1ikt1pkj1ikq1qkk1gkn1pkm1fkl1nkp1ckj1kkt19kh1hky16kg1el315ke1bl414kc19l314kc18l215kc17l316kd17l218kf17kx1bki18kp1ekl1aki1hko1ake1kks1bka1mkw1bk91ml01ak91ml519ka1llc18kb1jlg18kb1hlf19kc1flb1bkc1dla1dke1cl81fkh1bl51ikj1bkz1kkk1bkt1lkl1bkn1mkn1akj1lkp19kh1jkr18kf1hku16kd1ekz14ka1cl313k919l613k617l613k515l414k714l215ka13l117kh13kx19kp13kq1cku14kj1fkw16ke1ikx17kd1lkz19kc1ml119kc1ml51akc1kl81akc1ilb1bkc1flb1bkc1dl91ckb1al81dkd17l71dkh15l51ekl14kz1fko14kr1gkp15kl1gkp15ki1gkp15kg1fkq15kd1ekt14kb1cku14k91aky13k717l113k515l113k713kz13ka11kx14kf10kv16kn0zku17kx0zks1al310km1dl113ki1hkz16kh1kkx19kg1mkz1ckf1ml01dkf1ll21eke1il51eke1el61ekf1al41dkf17l41ckg13l31akk11l219kq10kz19ks10ks1akr11kl1bkp13ki1cko14kf1cko15ke1cko16kc1akp16ka19kp15ka16kp15kb14kp15ke12kp15kl10ko15kr0zko16kx0ykp17l50ykr19la10kp1cl513kl1gl018kj1jkx1cki1lkv1gki1lkw1ikh1kky1ikh1hkz1hki1dkz1fkk19kz1dkl15kx1akn12kw18kq0zkw16kv0ykw16kw0zkr17kt11kl18kp14ki1akm16kg1bkl18kf1bkk19kf1aki19kf19kg19kh17kd19kl15kb18kr13kc18kz11ke18l610kg18l90zkj19lb10kn1ald13ko1cl817km1fl11ckk1ikv1hkk1kkt1lkk1kkt1mkj1jkt1mkl1gks1kko1cks1hkq18ks1ekt15kq1aku12ko18kw11kp16ky10kp15l011ko16kw14kk17kr17ki19km19kh1akj1cki1akg1dkj1akc1ekm19k81ekr18k31ekx16k21dl414k21dld13k61clh12ka1blg13kd1ble15kh1cle18kk1dl91ckl1fl21hkk1hkw1mkk1iks1okl1ikq1pkn1hko1okp1ekn1mks1bkl1ikx18kk1fl016ki1bl214kg19l113kg17l113kh16l115kj16l017ki16ku1akj18ko1ckk19kh1fkm1akd1hkp1ak81ikt19k41iky18k11il517jz1ilc16k01hlk16k21glm17k51fli18k81ele1bkc1dld1ekf1dla1hkj1dl31lkl1ekw1okm1fkr1qkn1fkn1qkq1ekk1okt1cki1mkw1akg1il118kd1fl417kc1cl516ka1al416k918l216ka17l218kc16l219kg15kx1bkm16kp1eko17ki1gkr18kc1jkv19k71kkz19k31ll419k21ml919k21lld1ak31klh1ak41ili1ck61hlf1dk71flc1gka1dla1ike1cl91kki1bl41lkm1bkx1nko1bkp1okq1bkl1oks1bkh1mkv1bke1kky1akb1il119k91fl418k71dl618k51al618k418l418k517l119k915kz1akg14kw1ckp14kq1ekw15kj1hkz16kc1jl018k91ml21ak71ol41bk71ol61dk71ol91ek81mlc1fk71kld1gk81ilc1ik91fl91jkb1cl71jke1al71jkk18l31kkp18kw1kkr18kp1lkr19kj1lks1akg1kkt1akd1jkv1aka1hkx1ak81fl01ak61dl119k51al219k618l01ak816kw1akd15kt1bkk13kr1ckv13kp1el414kk1gl516kg1kl319kd1nl11ckc1pl11fkc1ql21ikb1pl41jkc1ol61kkc1ll71lkd1hl71lke1el51kkf1bl31jkj18l21iko16l01hkt16ku1hku17kn1ikr19ki1jkr1akf1jkq1ckd1ikq1ckc1hkr1cka1fkr1cka1dkr1cka1akr1bke18kp1bkj16kn1bkp14km1ckv13kl1dl213km1ela15kl1hla18kj1kl31ckg1nl01hkf1qky1lkf1rky1nkf1qkz1pkg1nl01pkh1kl21okj1gl11mkl1dkz1kkn1akx1hkq17kv1fku16kv1fkw16kr1fkv18km1gkr1akh1hkp1dkf1hkn1eke1hkm1fke1gkk1gkf1fki1fkg1ckf1fkk1akc1ekq18kb1dkz16kb1dl714kd1dla14ke1elb15kh1fld17kk1hlb1bkj1kl41gkj1nky1lki1pkv1qki1pkv1ski1oku1tkk1mkv1rkm1ikv1pkq1fkv1lkt1bkt1iku19kr1gkv17kp1ekx17ko1ckz17kn1ckx19kj1dkt1ckh1ekp1ekg1fkl1hkg1fki1iki1eke1ikl1dka1iko1bk51hku19k21gl217k11glb15k31flk15k61elk15k91elg17kc1fle1akg1glb1eki1il61kki1kl01oki1lkv1skk1mks1ukl1lkr1tkn1ikq1rkr1fkp1nkv1cko1kkz19km1gl118kk1dl017kh1bl017kh1al118kh19l019kh19kw1ckh1akq1ekj1bkk1gkk1bkf1ikn1bka1jkr1ak51jkv19k21il118jz1il816jz1hlh15k01fln16k31ell17k61elg19k91dld1ckd1dlc1gkg1el71kkk1el01okl1fku1qkm1gkq1rko1fko1qkq1ekm1okt1ckk1kkx19ki1hl117kh1dl316ke1bl215kc18l216kb16l116kd15l017kh14kx19kl14kr1bkn15kk1ekq16ke1fks16k91hkv17k61ikz17k31il317k21il816k21hld17k31gli17k51elg19k71cle1bk91alb1dkc19la1fkh18l81hkl18l11kko19ku1lko19kp1mkq1akl1lkr19kj1jkt18kg1hkw17ke1ekz16kc1bl115kb18l114kb15l014ka13ky14kd11kx15ki10kv16kq0zkr17kw0zkk19kx11kf1ckx13ka1fky15k81h";
+var HT = [];
+(function(){
+  var t = T0;
+  for (var i = 0; i < ENC.length; i += 4) {
+    t += parseInt(ENC.substr(i, 2), 36);
+    HT.push({ t: t * 60000, h: parseInt(ENC.substr(i + 2, 2), 36) / 10 });
+  }
+})();
+
+var MIN = 60000, HR = 3600000;
+var BEFORE = 210 * MIN;   /* gates close 3h30m before HW */
+var AFTER  = 150 * MIN;   /* gates open  2h30m after  HW */
+var TZ = "America/New_York";
+
+var COVER_A = HT[0].t + AFTER;
+var COVER_B = HT[HT.length - 1].t - BEFORE;
+
+/* ---------- eastern-time helpers ---------- */
+var PARTS = new Intl.DateTimeFormat("en-US", {
+  timeZone: TZ, hour12: false, year: "numeric", month: "2-digit",
+  day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit"
+});
+function nyParts(ms) {
+  var o = {}, a = PARTS.formatToParts(new Date(ms));
+  for (var i = 0; i < a.length; i++) o[a[i].type] = a[i].value;
+  return {
+    y: +o.year, m: +o.month, d: +o.day,
+    h: o.hour === "24" ? 0 : +o.hour, mi: +o.minute, s: +o.second
+  };
+}
+function offsetMs(ms) {
+  var p = nyParts(ms);
+  return Date.UTC(p.y, p.m - 1, p.d, p.h, p.mi, p.s) - ms;
+}
+function nyToMs(y, m, d, h, mi) {
+  var wall = Date.UTC(y, m - 1, d, h, mi, 0), g = wall;
+  for (var i = 0; i < 3; i++) g = wall - offsetMs(g);
+  return g;
+}
+var FMT_T = new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "numeric", minute: "2-digit" });
+var FMT_D = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short", month: "short", day: "numeric" });
+var FMT_W = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short" });
+var FMT_DY = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "long", month: "long", day: "numeric", year: "numeric" });
+function hhmm(ms) { return FMT_T.format(new Date(ms)).replace(/ /g, " "); }
+function dayLabel(ms) { return FMT_D.format(new Date(ms)); }
+function dayKey(ms) { var p = nyParts(ms); return p.y * 10000 + p.m * 100 + p.d; }
+function relDay(t, ref) {
+  var a = dayKey(ref), b = dayKey(t);
+  if (a === b) return "Today";
+  var p = nyParts(ref);
+  if (b === dayKey(nyToMs(p.y, p.m, p.d + 1, 12, 0))) return "Tomorrow";
+  return FMT_W.format(new Date(t));
+}
+
+/* ---------- the algorithm ---------- */
+function stateAt(ms) {
+  if (ms < COVER_A || ms > COVER_B) return { out: true };
+  var i, s, e;
+  for (i = 0; i < HT.length; i++) {
+    s = HT[i].t - BEFORE; e = HT[i].t + AFTER;
+    if (ms >= s && ms < e) return { open: false, since: s, until: e, hw: HT[i] };
+    if (s > ms) {
+      return {
+        open: true,
+        since: HT[i - 1].t + AFTER,
+        until: s,
+        hw: HT[i - 1],
+        nextHw: HT[i]
+      };
+    }
+  }
+  return { out: true };
+}
+/* transitions strictly after ms, oldest first */
+function transitionsAfter(ms, n) {
+  var out = [], i;
+  for (i = 0; i < HT.length && out.length < n; i++) {
+    var s = HT[i].t - BEFORE, e = HT[i].t + AFTER;
+    if (s > ms) out.push({ t: s, toOpen: false, hw: HT[i] });
+    if (e > ms && out.length < n) out.push({ t: e, toOpen: true, hw: HT[i] });
+  }
+  out.sort(function(a, b){ return a.t - b.t; });
+  return out.slice(0, n);
+}
+
+function dur(ms) {
+  var m = Math.max(0, Math.round(ms / MIN)), h = Math.floor(m / 60);
+  m = m % 60;
+  if (h >= 24) { var d = Math.floor(h / 24); return d + "d " + (h % 24) + "h"; }
+  return h > 0 ? h + "h " + (m < 10 ? "0" : "") + m + "m" : m + "m";
+}
+
+/* ---------- view state ---------- */
+var pinned = null;                 /* null = live */
+var dayAnchor = null;              /* ms inside the displayed day */
+function active(){ return pinned === null ? Date.now() : pinned; }
+
+var $ = function(id){ return document.getElementById(id); };
+
+/* ---------- hero ---------- */
+function renderHero() {
+  var ms = active(), st = stateAt(ms), hero = $("hero");
+  $("heroMode").textContent = pinned === null ? "Live" : dayLabel(ms) + " · " + hhmm(ms);
+
+  if (st.out) {
+    hero.style.setProperty("--st", "var(--ink-3)");
+    $("heroEyebrow").textContent = "No prediction";
+    $("heroTitle").textContent = "Out of range";
+    $("heroDesc").textContent = "This app carries tide predictions from Sep 1 2026 through Dec 31 2028. Pick a time inside that window.";
+    $("heroDirs").innerHTML = "";
+    $("clockLab").textContent = "—"; $("clockBig").textContent = "—";
+    $("atLab").textContent = "—"; $("atBig").textContent = "—";
+    $("heroFlag").innerHTML = "";
+    return;
+  }
+
+  hero.style.setProperty("--st", st.open ? "var(--run)" : "var(--lock)");
+  $("heroEyebrow").textContent = st.open ? "Gates open" : "Gates closed";
+  $("heroTitle").textContent = st.open ? "Current running" : "Lock passage";
+  $("heroDesc").textContent = st.open
+    ? "Water is flowing north to south through the gate openings, building to about 6 knots at peak."
+    : "The gates are shut and the canal is quiet. Traffic passes through the lock chamber.";
+
+  $("heroDirs").innerHTML = st.open
+    ? '<div class="dir"><b>Southbound</b><span>Fast and committed — the set is with you the whole way through.</span></div>' +
+      '<div class="dir"><b>Northbound</b><span>Against the full current. Underpowered boats can lose steerage.</span></div>'
+    : '<div class="dir"><b>Both ways</b><span>Easy water, but one lock chamber — expect to wait out opposing traffic.</span></div>';
+
+  $("clockLab").textContent = st.open ? "Gates close in" : "Gates open in";
+  $("clockBig").textContent = dur(st.until - ms);
+  $("atLab").textContent = "At";
+  $("atBig").textContent = hhmm(st.until);
+
+  var near = st.until - ms <= 20 * MIN || ms - st.since <= 20 * MIN;
+  $("heroFlag").innerHTML = near
+    ? '<span class="flag">Within 20 minutes of a change — verify on scene before committing.</span>'
+    : '<span class="flag mute">Sandy Hook high water ' + hhmm(st.hw.t) + ' · ' + st.hw.h.toFixed(1) + ' ft</span>';
+}
+
+/* ---------- day strip ---------- */
+function renderStrip() {
+  var p = nyParts(dayAnchor);
+  var a = nyToMs(p.y, p.m, p.d, 0, 0);
+  var b = nyToMs(p.y, p.m, p.d + 1, 0, 0);
+  var span = b - a;
+  var pct = function(ms){ return ((ms - a) / span) * 100; };
+
+  $("stripDay").textContent = FMT_DY.format(new Date(a));
+
+  /* closed windows overlapping the day */
+  var closed = [], i;
+  for (i = 0; i < HT.length; i++) {
+    var s = HT[i].t - BEFORE, e = HT[i].t + AFTER;
+    if (e > a && s < b) closed.push([Math.max(s, a), Math.min(e, b), HT[i]]);
+  }
+
+  var html = "", cur = a;
+  for (i = 0; i < closed.length; i++) {
+    if (closed[i][0] > cur) html += seg(cur, closed[i][0], "open");
+    html += seg(closed[i][0], closed[i][1], "closed");
+    cur = closed[i][1];
+  }
+  if (cur < b) html += seg(cur, b, "open");
+  for (i = 0; i < closed.length; i++) {
+    if (closed[i][2].t > a && closed[i][2].t < b)
+      html += '<div class="hw" style="left:' + pct(closed[i][2].t).toFixed(3) + '%"></div>';
+  }
+  var now = Date.now();
+  if (now >= a && now < b) html += '<div class="nowline" style="left:' + pct(now).toFixed(3) + '%"></div>';
+  $("track").innerHTML = html;
+
+  function seg(s, e, cls) {
+    return '<div class="seg ' + cls + '" style="left:' + pct(s).toFixed(3) +
+           '%;width:' + (pct(e) - pct(s)).toFixed(3) + '%"></div>';
+  }
+
+  var ax = "", labels = [0, 6, 12, 18, 24], names = ["12a", "6a", "12p", "6p", "12a"];
+  for (i = 0; i < labels.length; i++) {
+    var x = (labels[i] / 24) * 100;
+    ax += '<span style="left:' + x + '%;' +
+          (i === 0 ? "transform:none;" : i === labels.length - 1 ? "transform:translateX(-100%);" : "") +
+          '">' + names[i] + "</span>";
+  }
+  $("axis").innerHTML = ax;
+
+  var hw = "";
+  for (i = 0; i < closed.length; i++) {
+    var t = closed[i][2];
+    if (t.t > a && t.t < b) hw += "<span>HW <b>" + hhmm(t.t) + "</b> · " + t.h.toFixed(1) + " ft</span>";
+  }
+  $("hwrow").innerHTML = hw || "<span>No Sandy Hook high water falls inside this day.</span>";
+}
+
+/* ---------- transitions ---------- */
+function renderTimeline() {
+  var ms = active(), list = transitionsAfter(ms, 6), html = "";
+  for (var i = 0; i < list.length; i++) {
+    var x = list[i];
+    html += '<div class="row" style="--st:' + (x.toOpen ? "var(--run)" : "var(--lock)") + '">' +
+              '<span class="pip"></span>' +
+              '<span class="what"><b>' + (x.toOpen ? "Gates open" : "Gates close") + "</b>" +
+                "<span>HW " + hhmm(x.hw.t) + " · " + x.hw.h.toFixed(1) + " ft</span></span>" +
+              '<span class="when">' + hhmm(x.t) + "<small>" + relDay(x.t, ms) + " · in " + dur(x.t - ms) + "</small></span>" +
+            "</div>";
+  }
+  $("timeline").innerHTML = html || '<div class="row"><span></span><span class="what"><b>No further predictions</b><span>Beyond the embedded range.</span></span><span></span></div>';
+}
+
+function renderAll(){ renderHero(); renderStrip(); renderTimeline(); }
+
+/* ---------- controls ---------- */
+function pad(n){ return (n < 10 ? "0" : "") + n; }
+function toInput(ms){ var p = nyParts(ms); return p.y + "-" + pad(p.m) + "-" + pad(p.d) + "T" + pad(p.h) + ":" + pad(p.mi); }
+
+$("go").addEventListener("click", function(){
+  var v = $("pick").value;
+  var m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(v);
+  if (!m) return;
+  pinned = nyToMs(+m[1], +m[2], +m[3], +m[4], +m[5]);
+  dayAnchor = pinned;
+  renderAll();
+  document.getElementById("hero").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+$("live").addEventListener("click", function(){
+  pinned = null; dayAnchor = Date.now();
+  $("pick").value = toInput(Date.now());
+  renderAll();
+});
+$("dayPrev").addEventListener("click", function(){ stepDay(-1); });
+$("dayNext").addEventListener("click", function(){ stepDay(1); });
+function stepDay(k){
+  var p = nyParts(dayAnchor);
+  dayAnchor = nyToMs(p.y, p.m, p.d + k, 12, 0);
+  renderStrip();
+}
+
+/* ---------- boot ---------- */
+dayAnchor = Date.now();
+$("pick").value = toInput(Date.now());
+$("coverEnd").textContent = dayLabel(COVER_B) + ", " + nyParts(COVER_B).y;
+renderAll();
+setInterval(function(){ if (pinned === null) { renderHero(); renderTimeline(); renderStrip(); } }, 30000);
+
+})();
+</script>
+
+
+<script>
+(function(){
+  var el = document.getElementById("swstate");
+  function say(t, ok){ if(!el) return; el.textContent = t; el.className = ok ? "ready" : ""; }
+  var SAVED = "Saved to this device \u2014 works with no signal";
+  if (!("serviceWorker" in navigator)) { say("This browser can't store the app offline.", false); return; }
+  say(navigator.serviceWorker.controller ? SAVED : "Saving to this device\u2026 keep a connection for a moment",
+      !!navigator.serviceWorker.controller);
+  window.addEventListener("load", function(){
+    navigator.serviceWorker.register("./sw.js").then(function(reg){
+      if (navigator.serviceWorker.controller) say(SAVED, true);
+      reg.addEventListener("updatefound", function(){
+        var w = reg.installing; if (!w) return;
+        w.addEventListener("statechange", function(){ if (w.state === "activated") say(SAVED, true); });
+      });
+    }).catch(function(){
+      say("Couldn't save offline \u2014 needs an https:// address, not a local file.", false);
+    });
+  });
+})();
+</script>
+</body>
+</html>

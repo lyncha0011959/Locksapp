@@ -1,0 +1,576 @@
+<title>Shinnecock Gate Clock</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#E6ECEE;
+  --card:#F4F7F8;
+  --sunk:#DAE3E6;
+  --ink:#0C1D25;
+  --ink-2:#3D5560;
+  --ink-3:#6B838D;
+  --rule:#C2D0D5;
+  --rule-2:#AEC0C6;
+  --run:#B3095F;
+  --run-ink:#8A0549;
+  --run-wash:#F7DDEA;
+  --lock:#0B6E4B;
+  --lock-ink:#0A5C3F;
+  --lock-wash:#D6EBE1;
+  --accent:#2C6079;
+  --focus:#2C6079;
+  --shadow:0 1px 2px rgba(12,29,37,.08), 0 6px 18px -10px rgba(12,29,37,.28);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#07131A;
+    --card:#0E212B;
+    --sunk:#0A1A22;
+    --ink:#E4EEF2;
+    --ink-2:#A2B7C0;
+    --ink-3:#71888F;
+    --rule:#1D3844;
+    --rule-2:#2A4C5B;
+    --run:#FF5CA8;
+    --run-ink:#FF8AC1;
+    --run-wash:#2A0D1E;
+    --lock:#3DD69A;
+    --lock-ink:#6FE5B6;
+    --lock-wash:#06251A;
+    --accent:#7FC2DE;
+    --focus:#7FC2DE;
+    --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -12px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#07131A;
+  --card:#0E212B;
+  --sunk:#0A1A22;
+  --ink:#E4EEF2;
+  --ink-2:#A2B7C0;
+  --ink-3:#71888F;
+  --rule:#1D3844;
+  --rule-2:#2A4C5B;
+  --run:#FF5CA8;
+  --run-ink:#FF8AC1;
+  --run-wash:#2A0D1E;
+  --lock:#3DD69A;
+  --lock-ink:#6FE5B6;
+  --lock-wash:#06251A;
+  --accent:#7FC2DE;
+  --focus:#7FC2DE;
+  --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -12px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  background:var(--paper);
+  color:var(--ink);
+  font-family:"Public Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:560px;margin:0 auto;padding:20px 16px 56px;display:flex;flex-direction:column;gap:18px}
+
+.mono{font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;font-variant-numeric:tabular-nums}
+.eyebrow{
+  font-family:"IBM Plex Mono",ui-monospace,monospace;
+  font-size:10.5px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;
+}
+
+/* ---------- masthead ---------- */
+.masthead{display:flex;flex-direction:column;gap:5px;padding-bottom:14px;border-bottom:1px solid var(--rule)}
+.masthead h1{
+  font-family:"Archivo",sans-serif;font-weight:800;font-size:clamp(25px,7.2vw,33px);
+  letter-spacing:-.022em;line-height:1.02;margin:0;text-wrap:balance;
+}
+.masthead .sub{color:var(--ink-3);font-size:11px}
+.masthead .sub b{color:var(--ink-2);font-weight:500}
+
+/* ---------- state hero ---------- */
+.hero{
+  border-radius:3px;overflow:hidden;box-shadow:var(--shadow);
+  border:1px solid var(--rule);background:var(--card);
+}
+.hero .band{height:5px;background:var(--st)}
+.hero .body{padding:17px 18px 18px;display:flex;flex-direction:column;gap:11px}
+.hero .top{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.hero .eyebrow{color:var(--st)}
+.hero .mode{
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.11em;
+  text-transform:uppercase;color:var(--ink-3);
+}
+.hero h2{
+  font-family:"Archivo",sans-serif;font-weight:800;font-size:clamp(29px,9vw,40px);
+  line-height:1;letter-spacing:-.03em;margin:0;color:var(--st);text-wrap:balance;
+}
+.hero p{margin:0;color:var(--ink-2);font-size:14px;max-width:46ch}
+.hero .dirs{display:flex;flex-direction:column;gap:5px;padding-top:3px}
+.hero .dir{display:flex;gap:9px;align-items:baseline;font-size:12.5px;color:var(--ink-2)}
+.hero .dir b{
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--ink-3);min-width:74px;font-weight:500;flex:none;
+}
+
+.clockrow{
+  display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
+  margin-top:3px;padding-top:13px;border-top:1px dashed var(--rule-2);
+}
+.clockrow .lab{color:var(--ink-3);display:block;margin-bottom:2px}
+.clockrow .big{
+  font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:26px;
+  letter-spacing:-.02em;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;
+}
+.clockrow .at{text-align:right}
+.clockrow .at .big{font-size:19px;color:var(--st)}
+
+.flag{
+  display:inline-flex;align-items:center;gap:7px;padding:7px 10px;border-radius:2px;
+  background:var(--run-wash);color:var(--run-ink);font-size:12px;line-height:1.35;
+  border-left:3px solid var(--run);
+}
+.flag.mute{background:var(--sunk);color:var(--ink-2);border-left-color:var(--rule-2)}
+
+/* ---------- section shell ---------- */
+.sec{display:flex;flex-direction:column;gap:11px}
+.sec > .eyebrow{color:var(--ink-3)}
+.sechead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+/* ---------- day strip ---------- */
+.strip{
+  background:var(--card);border:1px solid var(--rule);border-radius:3px;
+  padding:15px 15px 11px;display:flex;flex-direction:column;gap:9px;box-shadow:var(--shadow);
+}
+.stripnav{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.stripnav .day{font-family:"Archivo",sans-serif;font-weight:600;font-size:14px;letter-spacing:-.01em}
+.stripnav .btns{display:flex;gap:6px}
+button{font:inherit;cursor:pointer}
+.nav{
+  width:30px;height:26px;display:grid;place-items:center;padding:0;
+  background:var(--sunk);color:var(--ink-2);border:1px solid var(--rule);border-radius:2px;
+  font-size:12px;line-height:1;
+}
+.nav:hover{border-color:var(--rule-2);color:var(--ink)}
+.nav:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+
+.track{position:relative;height:34px;border-radius:2px;overflow:hidden;background:var(--sunk)}
+.seg{position:absolute;top:0;bottom:0}
+.seg.open{background:var(--run)}
+.seg.closed{background:var(--lock)}
+.hw{position:absolute;top:0;bottom:0;width:1px;background:var(--paper);opacity:.85}
+.nowline{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);box-shadow:0 0 0 1.5px var(--card)}
+.nowline::after{
+  content:"";position:absolute;left:50%;top:-3px;transform:translateX(-50%);
+  border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--ink);
+}
+.axis{position:relative;height:15px}
+.axis span{
+  position:absolute;top:0;transform:translateX(-50%);
+  font-family:"IBM Plex Mono",monospace;font-size:9.5px;color:var(--ink-3);white-space:nowrap;
+}
+.hwrow{display:flex;flex-wrap:wrap;gap:5px 14px;padding-top:2px}
+.hwrow span{font-family:"IBM Plex Mono",monospace;font-size:10.5px;color:var(--ink-3)}
+.hwrow b{color:var(--ink-2);font-weight:500}
+.key{display:flex;gap:15px;flex-wrap:wrap;padding-top:4px;border-top:1px solid var(--rule)}
+.key i{display:flex;align-items:center;gap:6px;font-style:normal;font-size:11px;color:var(--ink-2)}
+.key i::before{content:"";width:11px;height:11px;border-radius:2px;background:var(--k);flex:none}
+
+/* ---------- transitions ---------- */
+.tl{display:flex;flex-direction:column;border:1px solid var(--rule);border-radius:3px;overflow:hidden;background:var(--card)}
+.tl .row{
+  display:grid;grid-template-columns:8px 1fr auto;align-items:center;gap:12px;
+  padding:11px 14px 11px 12px;border-top:1px solid var(--rule);
+}
+.tl .row:first-child{border-top:none}
+.tl .row .pip{width:8px;height:8px;border-radius:50%;background:var(--st)}
+.tl .row .what{display:flex;flex-direction:column;gap:1px;min-width:0}
+.tl .row .what b{font-weight:600;font-size:13.5px;color:var(--st)}
+.tl .row .what span{font-size:11px;color:var(--ink-3)}
+.tl .row .when{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums}
+.tl .row .when small{display:block;font-size:9.5px;color:var(--ink-3);letter-spacing:.01em}
+
+/* ---------- lookup ---------- */
+.lookup{
+  background:var(--card);border:1px solid var(--rule);border-radius:3px;
+  padding:15px;display:flex;flex-direction:column;gap:11px;
+}
+.lookup .ctl{display:flex;gap:8px;flex-wrap:wrap}
+input[type="datetime-local"]{
+  flex:1 1 200px;min-width:0;font:inherit;font-family:"IBM Plex Mono",monospace;font-size:13px;
+  padding:9px 10px;background:var(--paper);color:var(--ink);
+  border:1px solid var(--rule-2);border-radius:2px;
+}
+input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outline-offset:0;border-color:var(--focus)}
+.btn{
+  padding:9px 14px;background:var(--accent);color:var(--paper);border:1px solid var(--accent);
+  border-radius:2px;font-size:13px;font-weight:600;
+}
+.btn.ghost{background:transparent;color:var(--ink-2);border-color:var(--rule-2)}
+.btn:hover{filter:brightness(1.08)}
+.btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+/* ---------- notes ---------- */
+.notes{
+  background:var(--sunk);border:1px solid var(--rule);border-radius:3px;padding:15px 16px;
+  display:flex;flex-direction:column;gap:10px;
+}
+.notes h3{
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);margin:0;
+}
+.notes dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:5px 14px;font-size:12.5px}
+.notes dt{
+  font-family:"IBM Plex Mono",monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--ink-3);padding-top:2px;
+}
+.notes dd{margin:0;color:var(--ink-2)}
+.notes dd b{color:var(--ink);font-weight:600}
+.notes p{margin:0;font-size:12px;color:var(--ink-2);line-height:1.55}
+.notes .warn{color:var(--run-ink);font-weight:500}
+.notes a{color:var(--accent)}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+
+  <header class="masthead">
+    <h1>Shinnecock Gate Clock</h1>
+    <div class="sub">
+      Tide gates &amp; lock &middot; Hampton Bays, NY &middot; <b>Peconic&nbsp;Bay ↔ Shinnecock&nbsp;Bay</b><br>
+      Predicted from NOAA high water at <b>Sandy Hook, NJ &mdash; station 8531680</b>
+    </div>
+  </header>
+
+  <section class="hero" id="hero">
+    <div class="band"></div>
+    <div class="body">
+      <div class="top">
+        <span class="eyebrow" id="heroEyebrow">&mdash;</span>
+        <span class="mode" id="heroMode">Live</span>
+      </div>
+      <h2 id="heroTitle">&mdash;</h2>
+      <p id="heroDesc"></p>
+      <div class="dirs" id="heroDirs"></div>
+      <div class="clockrow">
+        <div>
+          <span class="eyebrow lab" id="clockLab">Changes in</span>
+          <span class="big" id="clockBig">&mdash;</span>
+        </div>
+        <div class="at">
+          <span class="eyebrow lab" id="atLab">At</span>
+          <span class="big" id="atBig">&mdash;</span>
+        </div>
+      </div>
+      <div id="heroFlag"></div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <span class="eyebrow">Day view</span>
+    <div class="strip">
+      <div class="stripnav">
+        <span class="day" id="stripDay">&mdash;</span>
+        <span class="btns">
+          <button class="nav" id="dayPrev" aria-label="Previous day">◀</button>
+          <button class="nav" id="dayNext" aria-label="Next day">▶</button>
+        </span>
+      </div>
+      <div class="track" id="track"></div>
+      <div class="axis" id="axis"></div>
+      <div class="hwrow" id="hwrow"></div>
+      <div class="key">
+        <i style="--k:var(--run)">Gates open &mdash; current running</i>
+        <i style="--k:var(--lock)">Gates closed &mdash; lock passage</i>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <span class="eyebrow">Next changes</span>
+    <div class="tl" id="timeline"></div>
+  </section>
+
+  <section class="sec">
+    <span class="eyebrow">Check another time</span>
+    <div class="lookup">
+      <div class="ctl">
+        <input type="datetime-local" id="pick" aria-label="Date and time to check">
+        <button class="btn" id="go">Check</button>
+        <button class="btn ghost" id="live">Back to now</button>
+      </div>
+      <p style="margin:0;font-size:11.5px;color:var(--ink-3)">
+        All times are canal local time (Eastern). Predictions run through <b id="coverEnd">&mdash;</b>.
+      </p>
+    </div>
+  </section>
+
+  <section class="notes">
+    <h3>Notes to mariners</h3>
+    <dl>
+      <dt>Rule</dt>
+      <dd>Gates <b>close 3 h 30 m before</b> Sandy Hook high water and <b>open 2 h 30 m after</b> &mdash; a closed window of six hours, then roughly 6 h 25 m open.</dd>
+      <dt>Source</dt>
+      <dd>NOAA CO&#8209;OPS harmonic tide predictions, ft MLLW, station 8531680. 1,648 high waters embedded &mdash; the app needs no signal.</dd>
+      <dt>On scene</dt>
+      <dd>Lock operator monitors <b>VHF 13</b> &middot; <b>631&#8209;852&#8209;8299</b>. Three horn blasts to request the lock; green light to proceed.</dd>
+    </dl>
+    <p class="warn">This is a prediction, not an observation. Wind and storm surge shift real tides by an hour or more, and mechanical failure or county maintenance overrides the schedule entirely &mdash; the canal has closed to all traffic on short notice before.</p>
+    <p>Not for navigation. Confirm on scene or by radio before committing to the cut. Predictions have not been verified against logged gate operations; treat the timing as approximate and widen your margin near a transition.</p>
+  </section>
+
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ---------- embedded tide table ---------- */
+var T0 = __T0__;
+var ENC = "__ENC__";
+var HT = [];
+(function(){
+  var t = T0;
+  for (var i = 0; i < ENC.length; i += 4) {
+    t += parseInt(ENC.substr(i, 2), 36);
+    HT.push({ t: t * 60000, h: parseInt(ENC.substr(i + 2, 2), 36) / 10 });
+  }
+})();
+
+var MIN = 60000, HR = 3600000;
+var BEFORE = 210 * MIN;   /* gates close 3h30m before HW */
+var AFTER  = 150 * MIN;   /* gates open  2h30m after  HW */
+var TZ = "America/New_York";
+
+var COVER_A = HT[0].t + AFTER;
+var COVER_B = HT[HT.length - 1].t - BEFORE;
+
+/* ---------- eastern-time helpers ---------- */
+var PARTS = new Intl.DateTimeFormat("en-US", {
+  timeZone: TZ, hour12: false, year: "numeric", month: "2-digit",
+  day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit"
+});
+function nyParts(ms) {
+  var o = {}, a = PARTS.formatToParts(new Date(ms));
+  for (var i = 0; i < a.length; i++) o[a[i].type] = a[i].value;
+  return {
+    y: +o.year, m: +o.month, d: +o.day,
+    h: o.hour === "24" ? 0 : +o.hour, mi: +o.minute, s: +o.second
+  };
+}
+function offsetMs(ms) {
+  var p = nyParts(ms);
+  return Date.UTC(p.y, p.m - 1, p.d, p.h, p.mi, p.s) - ms;
+}
+function nyToMs(y, m, d, h, mi) {
+  var wall = Date.UTC(y, m - 1, d, h, mi, 0), g = wall;
+  for (var i = 0; i < 3; i++) g = wall - offsetMs(g);
+  return g;
+}
+var FMT_T = new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "numeric", minute: "2-digit" });
+var FMT_D = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short", month: "short", day: "numeric" });
+var FMT_W = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short" });
+var FMT_DY = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "long", month: "long", day: "numeric", year: "numeric" });
+function hhmm(ms) { return FMT_T.format(new Date(ms)).replace(/ /g, " "); }
+function dayLabel(ms) { return FMT_D.format(new Date(ms)); }
+function dayKey(ms) { var p = nyParts(ms); return p.y * 10000 + p.m * 100 + p.d; }
+function relDay(t, ref) {
+  var a = dayKey(ref), b = dayKey(t);
+  if (a === b) return "Today";
+  var p = nyParts(ref);
+  if (b === dayKey(nyToMs(p.y, p.m, p.d + 1, 12, 0))) return "Tomorrow";
+  return FMT_W.format(new Date(t));
+}
+
+/* ---------- the algorithm ---------- */
+function stateAt(ms) {
+  if (ms < COVER_A || ms > COVER_B) return { out: true };
+  var i, s, e;
+  for (i = 0; i < HT.length; i++) {
+    s = HT[i].t - BEFORE; e = HT[i].t + AFTER;
+    if (ms >= s && ms < e) return { open: false, since: s, until: e, hw: HT[i] };
+    if (s > ms) {
+      return {
+        open: true,
+        since: HT[i - 1].t + AFTER,
+        until: s,
+        hw: HT[i - 1],
+        nextHw: HT[i]
+      };
+    }
+  }
+  return { out: true };
+}
+/* transitions strictly after ms, oldest first */
+function transitionsAfter(ms, n) {
+  var out = [], i;
+  for (i = 0; i < HT.length && out.length < n; i++) {
+    var s = HT[i].t - BEFORE, e = HT[i].t + AFTER;
+    if (s > ms) out.push({ t: s, toOpen: false, hw: HT[i] });
+    if (e > ms && out.length < n) out.push({ t: e, toOpen: true, hw: HT[i] });
+  }
+  out.sort(function(a, b){ return a.t - b.t; });
+  return out.slice(0, n);
+}
+
+function dur(ms) {
+  var m = Math.max(0, Math.round(ms / MIN)), h = Math.floor(m / 60);
+  m = m % 60;
+  if (h >= 24) { var d = Math.floor(h / 24); return d + "d " + (h % 24) + "h"; }
+  return h > 0 ? h + "h " + (m < 10 ? "0" : "") + m + "m" : m + "m";
+}
+
+/* ---------- view state ---------- */
+var pinned = null;                 /* null = live */
+var dayAnchor = null;              /* ms inside the displayed day */
+function active(){ return pinned === null ? Date.now() : pinned; }
+
+var $ = function(id){ return document.getElementById(id); };
+
+/* ---------- hero ---------- */
+function renderHero() {
+  var ms = active(), st = stateAt(ms), hero = $("hero");
+  $("heroMode").textContent = pinned === null ? "Live" : dayLabel(ms) + " · " + hhmm(ms);
+
+  if (st.out) {
+    hero.style.setProperty("--st", "var(--ink-3)");
+    $("heroEyebrow").textContent = "No prediction";
+    $("heroTitle").textContent = "Out of range";
+    $("heroDesc").textContent = "This app carries tide predictions from Sep 1 2026 through Dec 31 2028. Pick a time inside that window.";
+    $("heroDirs").innerHTML = "";
+    $("clockLab").textContent = "—"; $("clockBig").textContent = "—";
+    $("atLab").textContent = "—"; $("atBig").textContent = "—";
+    $("heroFlag").innerHTML = "";
+    return;
+  }
+
+  hero.style.setProperty("--st", st.open ? "var(--run)" : "var(--lock)");
+  $("heroEyebrow").textContent = st.open ? "Gates open" : "Gates closed";
+  $("heroTitle").textContent = st.open ? "Current running" : "Lock passage";
+  $("heroDesc").textContent = st.open
+    ? "Water is flowing north to south through the gate openings, building to about 6 knots at peak."
+    : "The gates are shut and the canal is quiet. Traffic passes through the lock chamber.";
+
+  $("heroDirs").innerHTML = st.open
+    ? '<div class="dir"><b>Southbound</b><span>Fast and committed — the set is with you the whole way through.</span></div>' +
+      '<div class="dir"><b>Northbound</b><span>Against the full current. Underpowered boats can lose steerage.</span></div>'
+    : '<div class="dir"><b>Both ways</b><span>Easy water, but one lock chamber — expect to wait out opposing traffic.</span></div>';
+
+  $("clockLab").textContent = st.open ? "Gates close in" : "Gates open in";
+  $("clockBig").textContent = dur(st.until - ms);
+  $("atLab").textContent = "At";
+  $("atBig").textContent = hhmm(st.until);
+
+  var near = st.until - ms <= 20 * MIN || ms - st.since <= 20 * MIN;
+  $("heroFlag").innerHTML = near
+    ? '<span class="flag">Within 20 minutes of a change — verify on scene before committing.</span>'
+    : '<span class="flag mute">Sandy Hook high water ' + hhmm(st.hw.t) + ' · ' + st.hw.h.toFixed(1) + ' ft</span>';
+}
+
+/* ---------- day strip ---------- */
+function renderStrip() {
+  var p = nyParts(dayAnchor);
+  var a = nyToMs(p.y, p.m, p.d, 0, 0);
+  var b = nyToMs(p.y, p.m, p.d + 1, 0, 0);
+  var span = b - a;
+  var pct = function(ms){ return ((ms - a) / span) * 100; };
+
+  $("stripDay").textContent = FMT_DY.format(new Date(a));
+
+  /* closed windows overlapping the day */
+  var closed = [], i;
+  for (i = 0; i < HT.length; i++) {
+    var s = HT[i].t - BEFORE, e = HT[i].t + AFTER;
+    if (e > a && s < b) closed.push([Math.max(s, a), Math.min(e, b), HT[i]]);
+  }
+
+  var html = "", cur = a;
+  for (i = 0; i < closed.length; i++) {
+    if (closed[i][0] > cur) html += seg(cur, closed[i][0], "open");
+    html += seg(closed[i][0], closed[i][1], "closed");
+    cur = closed[i][1];
+  }
+  if (cur < b) html += seg(cur, b, "open");
+  for (i = 0; i < closed.length; i++) {
+    if (closed[i][2].t > a && closed[i][2].t < b)
+      html += '<div class="hw" style="left:' + pct(closed[i][2].t).toFixed(3) + '%"></div>';
+  }
+  var now = Date.now();
+  if (now >= a && now < b) html += '<div class="nowline" style="left:' + pct(now).toFixed(3) + '%"></div>';
+  $("track").innerHTML = html;
+
+  function seg(s, e, cls) {
+    return '<div class="seg ' + cls + '" style="left:' + pct(s).toFixed(3) +
+           '%;width:' + (pct(e) - pct(s)).toFixed(3) + '%"></div>';
+  }
+
+  var ax = "", labels = [0, 6, 12, 18, 24], names = ["12a", "6a", "12p", "6p", "12a"];
+  for (i = 0; i < labels.length; i++) {
+    var x = (labels[i] / 24) * 100;
+    ax += '<span style="left:' + x + '%;' +
+          (i === 0 ? "transform:none;" : i === labels.length - 1 ? "transform:translateX(-100%);" : "") +
+          '">' + names[i] + "</span>";
+  }
+  $("axis").innerHTML = ax;
+
+  var hw = "";
+  for (i = 0; i < closed.length; i++) {
+    var t = closed[i][2];
+    if (t.t > a && t.t < b) hw += "<span>HW <b>" + hhmm(t.t) + "</b> · " + t.h.toFixed(1) + " ft</span>";
+  }
+  $("hwrow").innerHTML = hw || "<span>No Sandy Hook high water falls inside this day.</span>";
+}
+
+/* ---------- transitions ---------- */
+function renderTimeline() {
+  var ms = active(), list = transitionsAfter(ms, 6), html = "";
+  for (var i = 0; i < list.length; i++) {
+    var x = list[i];
+    html += '<div class="row" style="--st:' + (x.toOpen ? "var(--run)" : "var(--lock)") + '">' +
+              '<span class="pip"></span>' +
+              '<span class="what"><b>' + (x.toOpen ? "Gates open" : "Gates close") + "</b>" +
+                "<span>HW " + hhmm(x.hw.t) + " · " + x.hw.h.toFixed(1) + " ft</span></span>" +
+              '<span class="when">' + hhmm(x.t) + "<small>" + relDay(x.t, ms) + " · in " + dur(x.t - ms) + "</small></span>" +
+            "</div>";
+  }
+  $("timeline").innerHTML = html || '<div class="row"><span></span><span class="what"><b>No further predictions</b><span>Beyond the embedded range.</span></span><span></span></div>';
+}
+
+function renderAll(){ renderHero(); renderStrip(); renderTimeline(); }
+
+/* ---------- controls ---------- */
+function pad(n){ return (n < 10 ? "0" : "") + n; }
+function toInput(ms){ var p = nyParts(ms); return p.y + "-" + pad(p.m) + "-" + pad(p.d) + "T" + pad(p.h) + ":" + pad(p.mi); }
+
+$("go").addEventListener("click", function(){
+  var v = $("pick").value;
+  var m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(v);
+  if (!m) return;
+  pinned = nyToMs(+m[1], +m[2], +m[3], +m[4], +m[5]);
+  dayAnchor = pinned;
+  renderAll();
+  document.getElementById("hero").scrollIntoView({ behavior: "smooth", block: "start" });
+});
+$("live").addEventListener("click", function(){
+  pinned = null; dayAnchor = Date.now();
+  $("pick").value = toInput(Date.now());
+  renderAll();
+});
+$("dayPrev").addEventListener("click", function(){ stepDay(-1); });
+$("dayNext").addEventListener("click", function(){ stepDay(1); });
+function stepDay(k){
+  var p = nyParts(dayAnchor);
+  dayAnchor = nyToMs(p.y, p.m, p.d + k, 12, 0);
+  renderStrip();
+}
+
+/* ---------- boot ---------- */
+dayAnchor = Date.now();
+$("pick").value = toInput(Date.now());
+$("coverEnd").textContent = dayLabel(COVER_B) + ", " + nyParts(COVER_B).y;
+renderAll();
+setInterval(function(){ if (pinned === null) { renderHero(); renderTimeline(); renderStrip(); } }, 30000);
+
+})();
+</script>
