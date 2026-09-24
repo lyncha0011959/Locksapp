@@ -1,4 +1,4 @@
-<title>The Locks</title>
+<title>Locks Open?</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
@@ -20,7 +20,11 @@
   --accent:#2C6079;
   --focus:#2C6079;
   --land:#C7D3D6;
-  --water:#AFC9D6;
+  --water:#9FBED0;
+  --water-far:#B9D0DB;
+  --sky:#CBDEE9;
+  --steel:#8FA3AC;
+  --teal:#129C99;
   --shadow:0 1px 2px rgba(12,29,37,.08), 0 6px 18px -10px rgba(12,29,37,.28);
 }
 @media (prefers-color-scheme: dark){
@@ -43,6 +47,10 @@
     --focus:#7FC2DE;
     --land:#16303C;
     --water:#0D2836;
+    --water-far:#123243;
+    --sky:#0A2231;
+    --steel:#3C5867;
+    --teal:#12807E;
     --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -12px rgba(0,0,0,.8);
   }
 }
@@ -65,6 +73,10 @@
   --focus:#7FC2DE;
   --land:#16303C;
   --water:#0D2836;
+  --water-far:#123243;
+  --sky:#0A2231;
+  --steel:#3C5867;
+  --teal:#12807E;
   --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -12px rgba(0,0,0,.8);
 }
 
@@ -129,17 +141,30 @@ body{
   text-transform:uppercase;color:var(--ink-3);min-width:74px;font-weight:500;flex:none;
 }
 
-/* ---------- gate diagram (plan view, north at the left) ---------- */
-.gate{display:block;width:100%;height:auto;max-height:132px;color:var(--ink-3)}
-.gate .land{fill:var(--land)}
-.gate .water{fill:var(--water)}
-.gate .leaf{stroke:var(--st);stroke-width:11;stroke-linecap:round;fill:none}
-.gate .flow{stroke:var(--st);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:none}
-.gate .calm{stroke:var(--ink-3);stroke-width:2.5;stroke-linecap:round;opacity:.45}
-.gate .pin{fill:var(--card)}
+/* ---------- gate view: looking north from the water, as you'd see it from a boat ---------- */
+.gate{display:block;width:100%;height:auto;border-radius:2px;overflow:hidden}
+.gate .sky{fill:var(--sky)}
+.gate .conc{fill:var(--land)}
+.gate .steel{fill:var(--steel)}
+.gate .teal{fill:var(--teal)}
+.gate .far{fill:var(--water-far)}
+.gate .near{fill:var(--water)}
+.gate .leaf{fill:var(--st)}
+.gate .seam{stroke:var(--card);stroke-width:2;opacity:.55}
+.gate .rail{stroke:var(--steel);stroke-width:3;fill:none}
+.gate .chain{stroke:var(--steel);stroke-width:2;opacity:.8;fill:none}
+.gate .rush{stroke:var(--st);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.gate .ripple{stroke:var(--ink-3);stroke-width:2.5;stroke-linecap:round;fill:none;opacity:.4}
 .gate text{
-  font-family:"IBM Plex Mono",monospace;font-size:15px;font-weight:600;
-  fill:var(--ink-3);letter-spacing:.06em;
+  font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:500;
+  fill:var(--ink-3);letter-spacing:.12em;opacity:.85;
+}
+@keyframes gcRush{to{transform:translateY(30px)}}
+@keyframes gcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(2.5px)}}
+.gate .rushWrap{animation:gcRush 1.05s linear infinite}
+.gate .calmWrap{animation:gcBob 5s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){
+  .gate .rushWrap,.gate .calmWrap{animation:none}
 }
 
 .clockrow{
@@ -255,6 +280,31 @@ input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outlin
 .notes dd{margin:0;color:var(--ink-2)}
 .notes dd b{color:var(--ink);font-weight:600}
 .notes p{margin:0;font-size:13.5px;color:var(--ink-2);line-height:1.55}
+
+/* ---------- always-visible caution + collapsible About ---------- */
+.warnline{
+  margin:0;font-size:13px;line-height:1.4;color:var(--run-ink);
+  padding:10px 12px;background:var(--run-wash);
+  border-left:3px solid var(--run);border-radius:2px;
+}
+.about{border:1px solid var(--rule);border-radius:3px;background:var(--card);overflow:hidden}
+.about summary{
+  list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:15px;font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink-2);
+}
+.about summary::-webkit-details-marker{display:none}
+.about summary::marker{content:""}
+.about summary:focus-visible{outline:2px solid var(--focus);outline-offset:-2px}
+.about .chev{width:17px;height:17px;flex:none;color:var(--ink-3);transition:transform .18s ease}
+.about[open] .chev{transform:rotate(180deg)}
+.about .aboutbody{
+  display:flex;flex-direction:column;gap:16px;
+  padding:16px 15px;border-top:1px solid var(--rule);
+}
+.about .notes{border:none;background:transparent;padding:0}
+.about .masthead{padding-top:0}
+@media (prefers-reduced-motion:reduce){.about .chev{transition:none}}
 .notes .warn{color:var(--run-ink);font-weight:500}
 .notes a{color:var(--accent)}
 
@@ -322,13 +372,23 @@ input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outlin
         <button class="btn ghost" id="live">Back to now</button>
       </div>
       <p style="margin:0;font-size:13px;color:var(--ink-3)">
-        All times are canal local time (Eastern). Predictions run through <b id="coverEnd">&mdash;</b>.
+        All times EST/EDT. Predictions run through <b id="coverEnd">&mdash;</b>.
       </p>
     </div>
   </section>
 
+  <p class="warnline">Prediction only &mdash; not for navigation. Confirm on scene or on VHF&nbsp;13.</p>
+
+  <details class="about">
+    <summary>
+      <span>About &amp; notes to mariners</span>
+      <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+    </summary>
+    <div class="aboutbody">
+
   <header class="masthead">
-    <h1>The Locks</h1>
+    <h1>Locks Open?</h1>
     <div class="sub">
       Shinnecock Canal tide gates &amp; lock &middot; Hampton Bays, NY &middot; <b>Peconic&nbsp;Bay ↔ Shinnecock&nbsp;Bay</b><br>
       Predicted from NOAA high water at <b>Sandy Hook, NJ &mdash; station 8531680</b>
@@ -348,6 +408,11 @@ input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outlin
     <p class="warn">This is a prediction, not an observation. Wind and storm surge shift real tides by an hour or more, and mechanical failure or county maintenance overrides the schedule entirely &mdash; the canal has closed to all traffic on short notice before.</p>
     <p>Not for navigation. Confirm on scene or by radio before committing to the cut. Predictions have not been verified against logged gate operations; treat the timing as approximate and widen your margin near a transition.</p>
   </section>
+
+  <div id="buildinfo"></div>
+
+    </div>
+  </details>
 
 </div>
 
@@ -457,31 +522,70 @@ function active(){ return pinned === null ? Date.now() : pinned; }
 
 var $ = function(id){ return document.getElementById(id); };
 
-/* ---------- gate diagram: plan view of the cut, north (upstream) at the left ---------- */
+/* ---------- gate view: from the water, looking north up the canal ----------
+   Fixed structure (walls, catwalk, control house) stays put; only the leaves
+   and the water change. Open = clear channel with the set coming at you.      */
 function gateSVG(open) {
-  var s = '<svg class="gate" viewBox="0 0 480 108" role="img" aria-label="' +
-          (open ? "Gates open, water running north to south" : "Gates closed across the channel") + '">' +
-          '<rect class="water" x="0" y="0" width="480" height="108"/>' +
-          '<rect class="land" x="0" y="0" width="480" height="22"/>' +
-          '<rect class="land" x="0" y="86" width="480" height="22"/>';
+  var WL = 188;                                   /* waterline */
+  var s = '<svg class="gate" viewBox="0 0 480 250" role="img" aria-label="' +
+          (open ? "Looking north: gates open, water running toward you"
+                : "Looking north: gates shut across the channel") + '">';
+
+  var TOP = 112, DECK = 100, RAIL = 82;   /* leaf top, its walkway, its handrail */
+
+  s += '<defs><clipPath id="gcChan"><rect x="104" y="96" width="272" height="154"/></clipPath></defs>';
+
+  /* backdrop */
+  s += '<rect class="sky"  x="0" y="0"   width="480" height="104"/>' +
+       '<rect class="far"  x="0" y="104" width="480" height="' + (WL - 104) + '"/>' +
+       '<rect class="near" x="0" y="' + WL + '" width="480" height="' + (250 - WL) + '"/>';
+
+  /* water through the opening */
   if (open) {
-    /* leaves swung back against the banks, current running through */
-    s += '<path class="flow" d="M60 38 L78 54 L60 70"/>' +
-         '<path class="flow" d="M140 38 L158 54 L140 70"/>' +
-         '<path class="flow" d="M330 38 L348 54 L330 70"/>' +
-         '<path class="flow" d="M400 38 L418 54 L400 70"/>' +
-         '<path class="leaf" d="M280 22 H220"/>' +
-         '<path class="leaf" d="M280 86 H220"/>';
+    s += '<g clip-path="url(#gcChan)"><g class="rushWrap">';
+    for (var y = 70; y <= 262; y += 30) {
+      s += '<path class="rush" d="M170 ' + y + ' L240 ' + (y + 18) + ' L310 ' + y + '"/>';
+    }
+    s += '</g></g>';
   } else {
-    /* mitre gates shut, pointing upstream; flat water either side */
-    s += '<path class="calm" d="M50 40 H190"/><path class="calm" d="M62 68 H178"/>' +
-         '<path class="calm" d="M320 40 H430"/><path class="calm" d="M332 68 H418"/>' +
-         '<path class="leaf" d="M280 22 L232 54"/>' +
-         '<path class="leaf" d="M280 86 L232 54"/>';
+    s += '<g class="calmWrap">' +
+         '<path class="ripple" d="M40 212 H190"/><path class="ripple" d="M290 212 H442"/>' +
+         '<path class="ripple" d="M96 232 H230"/><path class="ripple" d="M262 232 H392"/>' +
+         '</g>';
   }
-  s += '<circle class="pin" cx="280" cy="22" r="5"/><circle class="pin" cx="280" cy="86" r="5"/>' +
-       '<text x="16" y="60">N</text><text x="464" y="60" text-anchor="end">S</text>' +
-       '</svg>';
+
+  /* A leaf carries its own walkway and handrail — they swing with the gate,
+     so when it opens there is nothing left spanning the channel. */
+  function leaf(x0, x1) {
+    var w = x1 - x0;
+    var g = '<rect class="leaf"  x="' + x0 + '" y="' + TOP + '" width="' + w + '" height="' + (WL - TOP) + '"/>' +
+            '<rect class="steel" x="' + x0 + '" y="' + DECK + '" width="' + w + '" height="' + (TOP - DECK) + '"/>' +
+            '<path class="rail" d="M' + x0 + ' ' + RAIL + ' H' + x1 + '"/>';
+    var n = Math.max(1, Math.round(w / 48));
+    for (var i = 0; i <= n; i++) {
+      var px = (x0 + w * i / n).toFixed(1);
+      g += '<path class="rail" d="M' + px + ' ' + RAIL + ' V' + DECK + '"/>';
+    }
+    return g;
+  }
+
+  if (open) {
+    /* leaves drawn back into the wall recesses; the walls overdraw their outer ends */
+    s += leaf(58, 104) + leaf(376, 422);
+  } else {
+    s += leaf(72, 408) +
+         '<path class="seam" d="M240 ' + DECK + ' V' + WL + '"/>' +
+         '<path class="chain" d="M150 120 L186 152"/><path class="chain" d="M330 120 L294 152"/>';
+  }
+
+  /* fixed structure: lock walls, control house on the east wall, light standard */
+  s += '<rect class="conc" x="0"   y="104" width="72" height="146"/>' +
+       '<rect class="conc" x="408" y="104" width="72" height="146"/>';
+  s += '<rect class="teal" x="408" y="44" width="68" height="60"/>' +
+       '<rect class="steel" x="401" y="36" width="76" height="9"/>' +
+       '<path class="rail" d="M36 22 V104"/><rect class="steel" x="27" y="13" width="19" height="10"/>';
+
+  s += '<text x="12" y="242">LOOKING NORTH</text></svg>';
   return s;
 }
 

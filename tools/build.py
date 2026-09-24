@@ -27,16 +27,12 @@ body = '<div class="wrap">' + rest
 head = head.replace('"Archivo",sans-serif',
                     '"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif')
 
-FOOT = """</section>
-
-  <footer class="foot">
-    <span>The Locks v2 &middot; tide table 1&nbsp;Sep&nbsp;2026 &ndash; 31&nbsp;Dec&nbsp;2028</span>
+FOOT = """<footer class="foot">
+    <span>Locks Open? v3 &middot; tide table 1&nbsp;Sep&nbsp;2026 &ndash; 31&nbsp;Dec&nbsp;2028</span>
     <span id="swstate">Checking device storage&hellip;</span>
-  </footer>
-
-</div>"""
-assert "</section>\n\n</div>" in body
-body = body.replace("</section>\n\n</div>", FOOT, 1)
+  </footer>"""
+assert '<div id="buildinfo"></div>' in body, "buildinfo placeholder missing"
+body = body.replace('<div id="buildinfo"></div>', FOOT, 1)
 
 EXTRA_CSS = """
 <style>
@@ -47,10 +43,10 @@ img{max-width:100%}
 [hidden]{display:none!important}
 body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
 .foot{
-  display:flex;flex-direction:column;gap:3px;padding-top:14px;margin-top:2px;
+  display:flex;flex-direction:column;gap:3px;padding-top:14px;
   border-top:1px solid var(--rule);
   font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
-  font-size:10px;letter-spacing:.04em;color:var(--ink-3);
+  font-size:11px;letter-spacing:.04em;color:var(--ink-3);
 }
 .foot #swstate{color:var(--ink-2)}
 .foot #swstate.ready::before{content:"\\2713\\00a0"}
@@ -93,7 +89,7 @@ SHELL = """<!doctype html>
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="The Locks">
+<meta name="apple-mobile-web-app-title" content="Locks Open?">
 {head}
 {extra}
 </head>

@@ -1,7 +1,7 @@
 /* Shinnecock Gate Clock — service worker.
    Bump CACHE when you change any file; the new version installs on the next
    online visit and takes over immediately. */
-var CACHE = "gateclock-v2";
+var CACHE = "gateclock-v5";
 
 var ASSETS = [
   "./",

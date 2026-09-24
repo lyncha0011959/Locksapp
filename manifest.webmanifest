@@ -1,6 +1,6 @@
 {
-  "name": "The Locks",
-  "short_name": "The Locks",
+  "name": "Locks Open?",
+  "short_name": "Locks Open?",
   "description": "Predicts when the Shinnecock Canal tide gates are open or closed, from NOAA Sandy Hook high water. Works with no signal.",
   "start_url": "./",
   "scope": "./",
