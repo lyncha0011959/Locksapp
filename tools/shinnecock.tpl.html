@@ -25,6 +25,7 @@
   --sky:#CBDEE9;
   --steel:#8FA3AC;
   --teal:#129C99;
+  --route:#15629E;
   --shadow:0 1px 2px rgba(12,29,37,.08), 0 6px 18px -10px rgba(12,29,37,.28);
 }
 @media (prefers-color-scheme: dark){
@@ -51,6 +52,8 @@
     --sky:#0A2231;
     --steel:#3C5867;
     --teal:#12807E;
+  --route:#63B8E8;
+    --route:#63B8E8;
     --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -12px rgba(0,0,0,.8);
   }
 }
@@ -142,7 +145,13 @@ body{
 }
 
 /* ---------- gate view: looking north from the water, as you'd see it from a boat ---------- */
-.gate{display:block;width:100%;height:auto;border-radius:2px;overflow:hidden}
+.gate{display:block;width:100%;height:auto;max-height:250px;border-radius:2px;overflow:hidden}
+.gate .routeCase{stroke:var(--card);stroke-width:13;stroke-linecap:round;fill:none;opacity:.9}
+.gate .route{stroke:var(--route);stroke-width:8;stroke-linecap:round;fill:none}
+.gate .routeHead{fill:var(--route);stroke:var(--card);stroke-width:2.5;stroke-linejoin:round}
+.gate .lockgate{fill:var(--steel)}
+.gate .compass{fill:var(--ink-3)}
+.gate .compassStem{stroke:var(--ink-3);stroke-width:3;stroke-linecap:round;fill:none}
 .gate .sky{fill:var(--sky)}
 .gate .conc{fill:var(--land)}
 .gate .steel{fill:var(--steel)}
@@ -308,8 +317,62 @@ input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outlin
 .notes .warn{color:var(--run-ink);font-weight:500}
 .notes a{color:var(--accent)}
 
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* ---------- sponsor: opening card and persistent credit ---------- */
+.splash{
+  position:fixed;inset:0;z-index:50;background:var(--paper);
+  display:flex;align-items:center;justify-content:center;
+  opacity:1;transition:opacity .35s ease;
+}
+.splash.gone{opacity:0;pointer-events:none}
+.splashInner{
+  display:flex;flex-direction:column;align-items:center;gap:15px;
+  padding:24px;width:100%;max-width:330px;
+}
+.splashEyebrow{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;
+  letter-spacing:.2em;text-transform:uppercase;color:var(--ink-3);
+}
+.sponsorCard{
+  background:#fff;border-radius:4px;padding:20px 24px;width:100%;
+  display:flex;justify-content:center;box-shadow:var(--shadow);
+}
+.sponsorCard img{width:100%;max-width:230px;height:auto;display:block}
+.splashApp{
+  font-family:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:700;
+  font-size:16px;letter-spacing:-.01em;color:var(--ink-2);
+}
+.splashBar{width:110px;height:3px;border-radius:2px;background:var(--rule);overflow:hidden}
+.splashBar i{display:block;height:100%;width:38%;border-radius:2px;background:var(--accent);
+  animation:gcSlide 1.1s ease-in-out infinite}
+@keyframes gcSlide{0%{transform:translateX(-115%)}100%{transform:translateX(330%)}}
+
+.sponsorline{
+  display:flex;align-items:center;justify-content:center;gap:12px;
+  padding:13px 14px;border:1px solid var(--rule);border-radius:3px;
+  background:var(--card);text-decoration:none;
+}
+.sponsorline span{
+  font-family:"IBM Plex Mono",monospace;font-size:10.5px;font-weight:500;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3);flex:none;
+}
+.sponsorline .badge{background:#fff;border-radius:3px;padding:7px 10px;display:flex}
+.sponsorline img{height:24px;width:auto;display:block}
+.sponsorline:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  .splashBar i{width:100%}
+}
 </style>
+
+<div class="splash" id="splash">
+  <div class="splashInner">
+    <span class="splashEyebrow">Presented by</span>
+    <div class="sponsorCard"><img src="__SPONSOR_LOGO__" alt="__SPONSOR_NAME__"></div>
+    <span class="splashApp">Shinnecock Locks</span>
+    <div class="splashBar"><i></i></div>
+  </div>
+</div>
 
 <div class="wrap">
 
@@ -377,6 +440,11 @@ input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outlin
     </div>
   </section>
 
+  <a class="sponsorline" href="__SPONSOR_URL__" target="_blank" rel="noopener">
+    <span>Presented by</span>
+    <span class="badge"><img src="__SPONSOR_LOGO__" alt="__SPONSOR_NAME__"></span>
+  </a>
+
   <p class="warnline">Prediction only &mdash; not for navigation. Confirm on scene or on VHF&nbsp;13.</p>
 
   <details class="about">
@@ -388,20 +456,20 @@ input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outlin
     <div class="aboutbody">
 
   <header class="masthead">
-    <h1>Locks Open?</h1>
+    <h1>Shinnecock Locks</h1>
     <div class="sub">
-      Shinnecock Canal tide gates &amp; lock &middot; Hampton Bays, NY &middot; <b>Peconic&nbsp;Bay ↔ Shinnecock&nbsp;Bay</b><br>
-      Predicted from NOAA high water at <b>Sandy Hook, NJ &mdash; station 8531680</b>
+      Tide gates &amp; lock &middot; Hampton Bays, NY &middot; <b>Peconic&nbsp;Bay ↔ Shinnecock&nbsp;Bay</b><br>
+      <span id="dataState">Loading tide predictions&hellip;</span>
     </div>
   </header>
 
   <section class="notes">
     <h3>Notes to mariners</h3>
     <dl>
-      <dt>Rule</dt>
-      <dd>Gates <b>close 3 h 30 m before</b> Sandy Hook high water and <b>open 2 h 30 m after</b> &mdash; a closed window of six hours, then roughly 6 h 25 m open.</dd>
-      <dt>Source</dt>
-      <dd>NOAA CO&#8209;OPS harmonic tide predictions, ft MLLW, station 8531680. 1,648 high waters embedded &mdash; the app needs no signal.</dd>
+      <dt>Passage</dt>
+      <dd>Northbound uses the <b>east gate</b> in all conditions. Southbound uses the east gate when locking through, and the <b>middle gate</b> when the gates are open and the current is running.</dd>
+      <dt>Timing</dt>
+      <dd>Gate state is predicted from published NOAA tide data using a fixed offset to local high water. A closed window of six hours alternates with roughly six and a half hours open.</dd>
       <dt>On scene</dt>
       <dd>Lock operator monitors <b>VHF 13</b> &middot; <b>631&#8209;852&#8209;8299</b>. Three horn blasts to request the lock; green light to proceed.</dd>
     </dl>
@@ -420,25 +488,76 @@ input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outlin
 (function(){
 "use strict";
 
-/* ---------- embedded tide table ---------- */
-var T0 = __T0__;
-var ENC = "__ENC__";
-var HT = [];
-(function(){
-  var t = T0;
-  for (var i = 0; i < ENC.length; i += 4) {
-    t += parseInt(ENC.substr(i, 2), 36);
-    HT.push({ t: t * 60000, h: parseInt(ENC.substr(i + 2, 2), 36) / 10 });
-  }
-})();
+/* ---------- tide data ----------
+   Live from NOAA on every open, so this never needs re-cutting by hand. The
+   last good table is kept on the device, so a dead spot or a slow cold start
+   shows the previous answer instead of nothing. The compiled-in sample is a
+   first-paint fallback only. */
+var SEED_T0 = __T0__;
+var SEED = "__ENC__";
+var STATION = "8531680";
+var LS_KEY = "shinnecock.locks.tides.v1";
+
+var HT = [], COVER_A = 0, COVER_B = 0;
 
 var MIN = 60000, HR = 3600000;
-var BEFORE = 210 * MIN;   /* gates close 3h30m before HW */
-var AFTER  = 150 * MIN;   /* gates open  2h30m after  HW */
+var BEFORE = 210 * MIN;
+var AFTER  = 150 * MIN;
 var TZ = "America/New_York";
 
-var COVER_A = HT[0].t + AFTER;
-var COVER_B = HT[HT.length - 1].t - BEFORE;
+function setHT(list) {
+  if (!list || list.length < 8) return false;
+  HT = list;
+  COVER_A = HT[0].t + AFTER;
+  COVER_B = HT[HT.length - 1].t - BEFORE;
+  return true;
+}
+function decodeSeed() {
+  var out = [], t = SEED_T0;
+  for (var i = 0; i < SEED.length; i += 4) {
+    t += parseInt(SEED.substr(i, 2), 36);
+    out.push({ t: t * 60000, h: parseInt(SEED.substr(i + 2, 2), 36) / 10 });
+  }
+  return out;
+}
+function storeTides(list) {
+  try {
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      f: Date.now(),
+      h: list.map(function (x) { return [Math.round(x.t / 60000), Math.round(x.h * 10)]; })
+    }));
+  } catch (e) {}
+}
+function readTides() {
+  try {
+    var o = JSON.parse(localStorage.getItem(LS_KEY) || "null");
+    if (!o || !o.h || !o.h.length) return null;
+    return { at: o.f, list: o.h.map(function (p) { return { t: p[0] * 60000, h: p[1] / 10 }; }) };
+  } catch (e) { return null; }
+}
+function pad2(n) { return (n < 10 ? "0" : "") + n; }
+function fetchTides() {
+  var now = Date.now(), a = new Date(now - 3 * 864e5), b = new Date(now + 400 * 864e5);
+  function ymd(d) { return d.getUTCFullYear() + pad2(d.getUTCMonth() + 1) + pad2(d.getUTCDate()); }
+  return fetch("https://api.tidesandcurrents.noaa.gov/api/prod/datagetter"
+      + "?product=predictions&application=shinnecock-locks"
+      + "&begin_date=" + ymd(a) + "&end_date=" + ymd(b)
+      + "&datum=MLLW&station=" + STATION
+      + "&time_zone=gmt&units=english&interval=hilo&format=json")
+    .then(function (r) { if (!r.ok) throw new Error("http " + r.status); return r.json(); })
+    .then(function (j) {
+      if (!j || !j.predictions) throw new Error("no predictions");
+      var out = [], p;
+      for (var i = 0; i < j.predictions.length; i++) {
+        p = j.predictions[i];
+        if (p.type !== "H") continue;
+        out.push({ t: Date.parse(p.t.replace(" ", "T") + ":00Z"),
+                   h: Math.round(parseFloat(p.v) * 10) / 10 });
+      }
+      if (out.length < 200) throw new Error("short table");
+      return out;
+    });
+}
 
 /* ---------- eastern-time helpers ---------- */
 var PARTS = new Intl.DateTimeFormat("en-US", {
@@ -527,66 +646,83 @@ var $ = function(id){ return document.getElementById(id); };
    Fixed structure (walls, catwalk, control house) stays put; only the leaves
    and the water change. Open = clear channel with the set coming at you.      */
 function gateSVG(open) {
-  var WL = 188;                                   /* waterline */
-  var s = '<svg class="gate" viewBox="0 0 480 250" role="img" aria-label="' +
-          (open ? "Looking north: gates open, water running toward you"
-                : "Looking north: gates shut across the channel") + '">';
+  var s = '<svg class="gate" viewBox="0 0 440 280" role="img" aria-label="' +
+          (open ? "Overhead view, north up. Gates open: water runs south through the west and middle bays. Northbound traffic uses the east lock, southbound uses the middle bay."
+                : "Overhead view, north up. Gates shut: all traffic uses the east lock.") + '">';
 
-  var TOP = 112, DECK = 100, RAIL = 82;   /* leaf top, its walkway, its handrail */
+  s += '<defs>' +
+       '<clipPath id="bayW"><rect x="92"  y="44" width="60" height="182"/></clipPath>' +
+       '<clipPath id="bayM"><rect x="176" y="44" width="72" height="182"/></clipPath>' +
+       '</defs>';
 
-  s += '<defs><clipPath id="gcChan"><rect x="104" y="96" width="272" height="154"/></clipPath></defs>';
+  /* canal and banks */
+  s += '<rect class="near" x="0" y="0" width="440" height="280"/>' +
+       '<rect class="conc" x="0"   y="0" width="70" height="280"/>' +
+       '<rect class="conc" x="370" y="0" width="70" height="280"/>';
 
-  /* backdrop */
-  s += '<rect class="sky"  x="0" y="0"   width="480" height="104"/>' +
-       '<rect class="far"  x="0" y="104" width="480" height="' + (WL - 104) + '"/>' +
-       '<rect class="near" x="0" y="' + WL + '" width="480" height="' + (250 - WL) + '"/>';
-
-  /* water through the opening */
+  /* the set, running south through whichever bays are open */
   if (open) {
-    s += '<g clip-path="url(#gcChan)"><g class="rushWrap">';
-    for (var y = 70; y <= 262; y += 30) {
-      s += '<path class="rush" d="M170 ' + y + ' L240 ' + (y + 18) + ' L310 ' + y + '"/>';
-    }
+    s += '<g clip-path="url(#bayW)"><g class="rushWrap">';
+    for (var y = 40; y <= 250; y += 30)
+      s += '<path class="rush" d="M100 ' + y + ' L122 ' + (y + 14) + ' L144 ' + y + '"/>';
+    s += '</g></g><g clip-path="url(#bayM)"><g class="rushWrap">';
+    for (var y2 = 40; y2 <= 250; y2 += 30)
+      s += '<path class="rush" d="M184 ' + y2 + ' L212 ' + (y2 + 14) + ' L240 ' + y2 + '"/>';
     s += '</g></g>';
-  } else {
-    s += '<g class="calmWrap">' +
-         '<path class="ripple" d="M40 212 H190"/><path class="ripple" d="M290 212 H442"/>' +
-         '<path class="ripple" d="M96 232 H230"/><path class="ripple" d="M262 232 H392"/>' +
-         '</g>';
   }
 
-  /* A leaf carries its own walkway and handrail — they swing with the gate,
-     so when it opens there is nothing left spanning the channel. */
-  function leaf(x0, x1) {
-    var w = x1 - x0;
-    var g = '<rect class="leaf"  x="' + x0 + '" y="' + TOP + '" width="' + w + '" height="' + (WL - TOP) + '"/>' +
-            '<rect class="steel" x="' + x0 + '" y="' + DECK + '" width="' + w + '" height="' + (TOP - DECK) + '"/>' +
-            '<path class="rail" d="M' + x0 + ' ' + RAIL + ' H' + x1 + '"/>';
-    var n = Math.max(1, Math.round(w / 48));
-    for (var i = 0; i <= n; i++) {
-      var px = (x0 + w * i / n).toFixed(1);
-      g += '<path class="rail" d="M' + px + ' ' + RAIL + ' V' + DECK + '"/>';
-    }
-    return g;
-  }
+  /* abutments and piers */
+  s += '<rect class="steel" x="70"  y="118" width="22" height="50"/>' +
+       '<rect class="steel" x="152" y="118" width="24" height="50"/>' +
+       '<rect class="steel" x="248" y="118" width="24" height="50"/>' +
+       '<rect class="steel" x="332" y="118" width="38" height="50"/>';
 
+  /* west and middle gates: shut or standing open */
   if (open) {
-    /* leaves drawn back into the wall recesses; the walls overdraw their outer ends */
-    s += leaf(58, 104) + leaf(376, 422);
+    s += '<rect class="leaf" x="92"  y="118" width="9" height="50"/>' +
+         '<rect class="leaf" x="143" y="118" width="9" height="50"/>' +
+         '<rect class="leaf" x="176" y="118" width="9" height="50"/>' +
+         '<rect class="leaf" x="239" y="118" width="9" height="50"/>';
   } else {
-    s += leaf(72, 408) +
-         '<path class="seam" d="M240 ' + DECK + ' V' + WL + '"/>' +
-         '<path class="chain" d="M150 120 L186 152"/><path class="chain" d="M330 120 L294 152"/>';
+    s += '<rect class="leaf" x="92"  y="128" width="60" height="30"/>' +
+         '<rect class="leaf" x="176" y="128" width="72" height="30"/>';
   }
 
-  /* fixed structure: lock walls, control house on the east wall, light standard */
-  s += '<rect class="conc" x="0"   y="104" width="72" height="146"/>' +
-       '<rect class="conc" x="408" y="104" width="72" height="146"/>';
-  s += '<rect class="teal" x="408" y="44" width="68" height="60"/>' +
-       '<rect class="steel" x="401" y="36" width="76" height="9"/>' +
-       '<path class="rail" d="M36 22 V104"/><rect class="steel" x="27" y="13" width="19" height="10"/>';
+  /* east bay is the lock: chamber walls, a gate at each end */
+  s += '<rect class="steel" x="268" y="86" width="6" height="112"/>' +
+       '<rect class="steel" x="330" y="86" width="6" height="112"/>' +
+       '<rect class="lockgate" x="274" y="114" width="56" height="10"/>' +
+       '<rect class="lockgate" x="274" y="162" width="56" height="10"/>';
 
-  s += '<text x="12" y="242">LOOKING NORTH</text></svg>';
+  /* highway bridge, south of the locks */
+  s += '<rect class="steel" x="0" y="226" width="440" height="13"/>' +
+       '<rect class="conc"  x="160" y="222" width="13" height="21"/>' +
+       '<rect class="conc"  x="252" y="222" width="13" height="21"/>';
+
+  /* operator's house on the east bank */
+  s += '<rect class="steel" x="374" y="120" width="52" height="8"/>' +
+       '<rect class="teal"  x="378" y="128" width="44" height="32"/>';
+
+  /* routes, cased so they read over the current */
+  function lane(x, south, a, b) {
+    var tip = south ? b : a;
+    var head = south
+      ? 'M' + x + ' ' + (tip + 15) + ' L' + (x - 9) + ' ' + (tip - 3) + ' L' + (x + 9) + ' ' + (tip - 3) + ' Z'
+      : 'M' + x + ' ' + (tip - 15) + ' L' + (x - 9) + ' ' + (tip + 3) + ' L' + (x + 9) + ' ' + (tip + 3) + ' Z';
+    return '<path class="routeCase" d="M' + x + ' ' + a + ' V' + b + '"/>' +
+           '<path class="route"     d="M' + x + ' ' + a + ' V' + b + '"/>' +
+           '<path class="routeHead" d="' + head + '"/>';
+  }
+  s += lane(292, false, 52, 256);                       /* northbound always locks through */
+  s += open ? lane(212, true, 48, 252)                  /* southbound rides the middle bay */
+            : lane(312, true, 52, 256);                 /* southbound locks through too */
+
+  /* compass */
+  s += '<path class="compass" d="M36 22 L28 40 L44 40 Z"/>' +
+       '<path class="compassStem" d="M36 40 V64"/>' +
+       '<text x="36" y="84" text-anchor="middle">N</text>';
+
+  s += '</svg>';
   return s;
 }
 
@@ -620,9 +756,9 @@ function renderHero() {
     : "The gates are shut. Traffic passes through the lock chamber.";
 
   $("heroDirs").innerHTML = st.open
-    ? '<div class="dir"><b>Southbound</b><span>Fast and committed — the set is with you the whole way through.</span></div>' +
-      '<div class="dir"><b>Northbound</b><span>Against the full current. Underpowered boats can lose steerage.</span></div>'
-    : '<div class="dir"><b>Both ways</b><span>Easy water, but one lock chamber — expect to wait out opposing traffic.</span></div>';
+    ? '<div class="dir"><b>Northbound</b><span>East gate &mdash; lock through. Do not try the open bays against the set.</span></div>' +
+      '<div class="dir"><b>Southbound</b><span>Middle gate, running with the current. Fast and committed.</span></div>'
+    : '<div class="dir"><b>Both ways</b><span>East gate &mdash; lock through. One chamber, so expect to wait out opposing traffic.</span></div>';
 
   $("clockLab").textContent = st.open ? "Gates close in" : "Gates open in";
   $("clockBig").textContent = dur(st.until - ms);
@@ -684,9 +820,9 @@ function renderStrip() {
   var hw = "";
   for (i = 0; i < closed.length; i++) {
     var t = closed[i][2];
-    if (t.t > a && t.t < b) hw += "<span>HW <b>" + hhmm(t.t) + "</b> · " + t.h.toFixed(1) + " ft</span>";
+    if (t.t > a && t.t < b) hw += "";
   }
-  $("hwrow").innerHTML = hw || "<span>No Sandy Hook high water falls inside this day.</span>";
+  $("hwrow").innerHTML = hw;
 }
 
 /* ---------- transitions ---------- */
@@ -697,14 +833,18 @@ function renderTimeline() {
     html += '<div class="row" style="--st:' + (x.toOpen ? "var(--run)" : "var(--lock)") + '">' +
               '<span class="pip"></span>' +
               '<span class="what"><b>' + (x.toOpen ? "Gates open" : "Gates close") + "</b>" +
-                "<span>HW " + hhmm(x.hw.t) + " · " + x.hw.h.toFixed(1) + " ft</span></span>" +
+                "<span>" + (x.toOpen ? "Current starts running" : "Lock passage begins") + "</span></span>" +
               '<span class="when">' + hhmm(x.t) + "<small>" + relDay(x.t, ms) + " · in " + dur(x.t - ms) + "</small></span>" +
             "</div>";
   }
   $("timeline").innerHTML = html || '<div class="row"><span></span><span class="what"><b>No further predictions</b><span>Beyond the embedded range.</span></span><span></span></div>';
 }
 
-function renderAll(){ renderHero(); renderStrip(); renderTimeline(); }
+function renderAll(){
+  renderHero(); renderStrip(); renderTimeline();
+  var ce = $("coverEnd");
+  if (ce && COVER_B) ce.textContent = dayLabel(COVER_B) + ", " + nyParts(COVER_B).y;
+}
 
 /* ---------- controls ---------- */
 function pad(n){ return (n < 10 ? "0" : "") + n; }
@@ -732,6 +872,22 @@ function stepDay(k){
   renderStrip();
 }
 
+/* ---------- sponsor card on open ---------- */
+var splashAt = Date.now(), splashGone = false;
+function hideSplash() {
+  if (splashGone) return;
+  splashGone = true;
+  var el = $("splash");
+  el.className = "splash gone";
+  setTimeout(function () { el.hidden = true; }, 420);
+}
+$("splash").addEventListener("click", hideSplash);
+/* dismiss once the data has settled, but hold it long enough to actually be seen */
+function splashReady() {
+  setTimeout(hideSplash, Math.max(0, 1500 - (Date.now() - splashAt)));
+}
+setTimeout(hideSplash, 3400);   /* hard cap — never trap anyone behind it */
+
 /* ---------- boot ---------- */
 /* The webfont stylesheet is loaded as media="print" so it cannot block the
    first paint on a weak signal; switch it on once the app has drawn. Every
@@ -739,11 +895,35 @@ function stepDay(k){
 var wf = document.getElementById("webfonts");
 if (wf) wf.media = "all";
 
+function setDataState(txt) { var el = $("dataState"); if (el) el.textContent = txt; }
+function shortDate(ms) {
+  return new Intl.DateTimeFormat("en-US", { timeZone: TZ, month: "short", day: "numeric", year: "numeric" })
+    .format(new Date(ms));
+}
+
+/* paint from whatever is already on the device, then refresh from NOAA */
+var stored = readTides();
+var usable = stored && stored.list.length &&
+             stored.list[stored.list.length - 1].t > Date.now() + 14 * 864e5;
+setHT(usable ? stored.list : decodeSeed());
+
 dayAnchor = Date.now();
 $("pick").value = toInput(Date.now());
-$("coverEnd").textContent = dayLabel(COVER_B) + ", " + nyParts(COVER_B).y;
 renderAll();
 setInterval(function(){ if (pinned === null) { renderHero(); renderTimeline(); renderStrip(); } }, 30000);
+
+fetchTides().then(function (list) {
+  storeTides(list);
+  setHT(list);
+  renderAll();
+  setDataState("Tide data from NOAA, updated " + shortDate(Date.now()));
+  splashReady();
+}).catch(function () {
+  setDataState(usable
+    ? "Couldn't reach NOAA — showing stored data from " + shortDate(stored.at)
+    : "Couldn't reach NOAA — showing a built-in sample. Reconnect and reload.");
+  splashReady();
+});
 
 })();
 </script>

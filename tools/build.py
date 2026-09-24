@@ -1,34 +1,54 @@
 #!/usr/bin/env python3
-"""Rebuild ../index.html from the template and the encoded tide table.
+"""Build both deliverables from one source of truth.
 
-  shinnecock.tpl.html + encoded.txt  ->  ../index.html
+  shinnecock.tpl.html + seed.txt + sponsor/logo.png
+        -> shinnecock.html       (artifact body, layout preview only)
+        -> gateclock/index.html  (the live app)
 
-Run from this folder:  python3 build.py
+Tide data is fetched from NOAA at runtime; seed.txt is only a first-paint
+fallback and what the preview artifact runs on.
+
+Run:  python3 build.py
 """
+import base64
 import pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent
 OUT = ROOT.parent
+VERSION = "v9"
 
-# ---- 1. inject the tide table into the template -----------------------------
-t0, enc = (ROOT / "encoded.txt").read_text().split("\n")[:2]
+# ---- sponsor -----------------------------------------------------------------
+# To change sponsor: drop a new logo at gateclock/sponsor/logo.png (transparent
+# PNG, brand colour, ~440px wide) and edit the two lines below. Nothing else.
+SPONSOR_NAME = "Hampton Jitney"
+SPONSOR_URL = "https://www.hamptonjitney.com/"
+
+logo_b64 = base64.b64encode((OUT / "sponsor" / "logo.png").read_bytes()).decode()
+SPONSOR_LOGO = "data:image/png;base64," + logo_b64
+
+# ---- 1. inject data and sponsor ---------------------------------------------
+t0, enc = (ROOT / "seed.txt").read_text().split("\n")[:2]
 src = (ROOT / "shinnecock.tpl.html").read_text()
-src = src.replace("__T0__", t0.strip()).replace("__ENC__", enc.strip())
-assert "__T0__" not in src and "__ENC__" not in src, "data injection failed"
+src = (src.replace("__T0__", t0.strip())
+          .replace("__ENC__", enc.strip())
+          .replace("__SPONSOR_LOGO__", SPONSOR_LOGO)
+          .replace("__SPONSOR_NAME__", SPONSOR_NAME)
+          .replace("__SPONSOR_URL__", SPONSOR_URL))
+for token in ("__T0__", "__ENC__", "__SPONSOR_LOGO__", "__SPONSOR_NAME__", "__SPONSOR_URL__"):
+    assert token not in src, "unreplaced placeholder: " + token
 
-# ---- 2. split head / body ---------------------------------------------------
-MARK = '</style>\n\n<div class="wrap">'
+# ---- 2. split head / body ----------------------------------------------------
+MARK = '</style>\n\n<div class="splash"'
 assert MARK in src, "split marker not found"
 head, rest = src.split(MARK, 1)
 head += "</style>"
-body = '<div class="wrap">' + rest
+body = '<div class="splash"' + rest
 
-# the display face is the only one without a real fallback stack
 head = head.replace('"Archivo",sans-serif',
                     '"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif')
 
 FOOT = """<footer class="foot">
-    <span>Locks Open? v3 &middot; tide table 1&nbsp;Sep&nbsp;2026 &ndash; 31&nbsp;Dec&nbsp;2028</span>
+    <span>Shinnecock Locks &middot; Locks Open? """ + VERSION + """</span>
     <span id="swstate">Checking device storage&hellip;</span>
   </footer>"""
 assert '<div id="buildinfo"></div>' in body, "buildinfo placeholder missing"
@@ -36,7 +56,7 @@ body = body.replace('<div id="buildinfo"></div>', FOOT, 1)
 
 EXTRA_CSS = """
 <style>
-/* --- standalone / PWA additions (not present in the hosted artifact) --- */
+/* --- standalone / PWA additions (not present in the preview artifact) --- */
 :root{color-scheme:light dark}
 html,body{margin:0;padding:0}
 img{max-width:100%}
@@ -57,10 +77,9 @@ SW_JS = """
 (function(){
   var el = document.getElementById("swstate");
   function say(t, ok){ if(!el) return; el.textContent = t; el.className = ok ? "ready" : ""; }
-  var SAVED = "Saved to this device \\u2014 works with no signal";
-  if (!("serviceWorker" in navigator)) { say("This browser can't store the app offline.", false); return; }
-  say(navigator.serviceWorker.controller ? SAVED : "Saving to this device\\u2026 keep a connection for a moment",
-      !!navigator.serviceWorker.controller);
+  var SAVED = "App shell saved to this device";
+  if (!("serviceWorker" in navigator)) { say("This browser can't store the app shell.", false); return; }
+  say(navigator.serviceWorker.controller ? SAVED : "Saving app shell\\u2026", !!navigator.serviceWorker.controller);
   window.addEventListener("load", function(){
     navigator.serviceWorker.register("./sw.js").then(function(reg){
       if (navigator.serviceWorker.controller) say(SAVED, true);
@@ -69,18 +88,30 @@ SW_JS = """
         w.addEventListener("statechange", function(){ if (w.state === "activated") say(SAVED, true); });
       });
     }).catch(function(){
-      say("Couldn't save offline \\u2014 needs an https:// address, not a local file.", false);
+      say("Couldn't store the app shell \\u2014 needs an https:// address.", false);
     });
   });
 })();
 </script>"""
+
+# ---- 3. usage measurement ----------------------------------------------------
+# Put your Cloudflare Web Analytics token in cf_token.txt and rebuild. Until
+# then nothing is emitted, so no third party sees your users.
+token_file = ROOT / "cf_token.txt"
+if token_file.exists() and token_file.read_text().strip():
+    ANALYTICS = ('\n<!-- Cloudflare Web Analytics: no cookies, no consent banner -->\n'
+                 '<script defer src="https://static.cloudflareinsights.com/beacon.min.js" '
+                 'data-cf-beacon=\'{"token": "%s"}\'></script>' % token_file.read_text().strip())
+else:
+    ANALYTICS = ("\n<!-- Usage measurement: add your Cloudflare Web Analytics token to\n"
+                 "     cf_token.txt and rebuild, and the beacon tag lands here. -->")
 
 SHELL = """<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="description" content="Predicts when the Shinnecock Canal tide gates are open or closed, from NOAA Sandy Hook high water. Works with no signal.">
+<meta name="description" content="Is the Shinnecock Canal lock open or closed? Live gate status, next change, and passage routing for the Shinnecock Locks.">
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#E6ECEE" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#07131A" media="(prefers-color-scheme: dark)">
@@ -91,7 +122,7 @@ SHELL = """<!doctype html>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Locks Open?">
 {head}
-{extra}
+{extra}{analytics}
 </head>
 <body>
 {body}
@@ -100,8 +131,11 @@ SHELL = """<!doctype html>
 </html>
 """
 
-doc = SHELL.format(head=head, extra=EXTRA_CSS, body=body, swjs=SW_JS)
+doc = SHELL.format(head=head, extra=EXTRA_CSS, body=body, swjs=SW_JS, analytics=ANALYTICS)
 (OUT / "index.html").write_text(doc)
+(OUT / ".nojekyll").write_text("")
 
-print("wrote ../index.html  %d bytes" % len(doc))
-print("remember to bump CACHE in ../sw.js")
+print("shinnecock.html      %6d bytes  (preview artifact)" % len(src))
+print("gateclock/index.html %6d bytes  (live app, %s)" % (len(doc), VERSION))
+print("sponsor              %s  (%.1f KB inline)" % (SPONSOR_NAME, len(logo_b64) / 1024))
+print("analytics            %s" % ("Cloudflare token present" if token_file.exists() else "not configured"))

@@ -3,8 +3,10 @@
 A one-page web app that predicts when the Shinnecock Canal tide gates are open or
 closed, so you know whether you're looking at a 6-knot flush or a wait at the lock.
 
-It installs to a phone home screen and **works with no signal** — the tide table is
-baked into the page, so nothing is fetched at runtime.
+It installs to a phone home screen. Tide predictions are fetched live from NOAA on
+every open, so the app never needs re-cutting by hand. The last good table is kept
+on the device, so a dead spot or a slow cold start shows the previous answer rather
+than a blank screen.
 
 ---
 
@@ -12,12 +14,13 @@ baked into the page, so nothing is fetched at runtime.
 
 | File | What it is |
 | --- | --- |
-| `index.html` | The whole app: markup, styles, logic, and 1,648 embedded high waters. No build step. |
+| `index.html` | The whole app: markup, styles, logic, the sponsor logo, and a small fallback tide sample. No build step. |
 | `manifest.webmanifest` | Makes it installable — name, icons, standalone display. |
 | `sw.js` | Service worker. Network-first for the page (so an update is never more than one load away), cache-first for icons. Either way the app opens with no signal. |
 | `icons/` | App icons (192, 512, maskable, favicon). |
 | `.nojekyll` | Stops GitHub Pages running Jekyll over the files. |
-| `tools/` | Scripts to regenerate the tide table and rebuild `index.html`. Not served. |
+| `sponsor/logo.png` | The sponsor mark. Swap this file and two lines in `tools/build.py` to change sponsor. |
+| `tools/` | Scripts to rebuild `index.html`. Not served. |
 
 Every path in the app is relative, so it works at any URL — repo root, a subpath,
 a custom domain, doesn't matter.
@@ -70,27 +73,25 @@ keep serving the old cached copy indefinitely.
 
 ---
 
-## Refreshing the tide table
+## Changing the sponsor
 
-The embedded predictions run **1 Sep 2026 – 31 Dec 2028**. Past that the app says
-"Out of range" rather than guessing — deliberately, because a wrong answer is worse
-than no answer here.
+The sponsor appears twice: on the opening card, and as a persistent credit above the
+About section. To change it:
 
-To extend it, on any machine with Python and internet:
+1. Replace `sponsor/logo.png` — transparent PNG, brand colour, about 440px wide.
+2. Edit `SPONSOR_NAME` and `SPONSOR_URL` near the top of `tools/build.py`.
+3. `cd tools && python3 build.py`, bump `CACHE` in `sw.js`, push.
 
-```bash
-cd tools
-python3 make_table.py 20280101 20301231   # start and end, YYYYMMDD
-python3 build.py                          # rewrites ../index.html
-```
+The logo is inlined into the page as a data URI, so there is no extra request and it
+shows instantly on the opening card.
 
-Then bump `CACHE` in `sw.js` and push.
+## Measuring usage
 
-`make_table.py` pulls high waters from the NOAA CO-OPS API (free, no key), runs
-integrity checks — no duplicates, gaps between 11 and 14 hours, mean interval near the
-12.4206 h M2 semidiurnal period — and refuses to write a table that fails them.
+Sign in to Cloudflare, add this site under **Web Analytics**, copy the token, and put
+it in `tools/cf_token.txt`. Rebuild and the beacon tag is emitted into the page. With
+no token file, nothing is emitted and no third party sees your visitors.
 
----
+You need these numbers before any sponsor conversation is worth having.
 
 ## The algorithm
 
