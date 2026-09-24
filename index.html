@@ -15,7 +15,7 @@
 <meta name="apple-mobile-web-app-title" content="Locks Open?">
 <title>Locks Open?</title>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<link id="webfonts" rel="stylesheet" media="print" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 :root{
   --paper:#E6ECEE;
@@ -443,7 +443,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   </section>
 
   <footer class="foot">
-    <span>Locks Open? v7 &middot; tide table 1&nbsp;Sep&nbsp;2026 &ndash; 31&nbsp;Dec&nbsp;2028</span>
+    <span>Locks Open? v8 &middot; tide table 1&nbsp;Sep&nbsp;2026 &ndash; 31&nbsp;Dec&nbsp;2028</span>
     <span id="swstate">Checking device storage&hellip;</span>
   </footer>
 
@@ -769,6 +769,12 @@ function stepDay(k){
 }
 
 /* ---------- boot ---------- */
+/* The webfont stylesheet is loaded as media="print" so it cannot block the
+   first paint on a weak signal; switch it on once the app has drawn. Every
+   family has a real fallback, so the page reads fine if it never arrives. */
+var wf = document.getElementById("webfonts");
+if (wf) wf.media = "all";
+
 dayAnchor = Date.now();
 $("pick").value = toInput(Date.now());
 $("coverEnd").textContent = dayLabel(COVER_B) + ", " + nyParts(COVER_B).y;

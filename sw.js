@@ -1,7 +1,12 @@
 /* Shinnecock Gate Clock — service worker.
    Bump CACHE when you change any file; the new version installs on the next
    online visit and takes over immediately. */
-var CACHE = "gateclock-v7";
+var CACHE = "gateclock-v8";
+
+/* How long to wait on the network before giving up and drawing the cached app.
+   A marginal signal can leave a fetch hanging far longer than a boater will
+   stand there holding a phone. */
+var NAV_TIMEOUT = 1200;
 
 var ASSETS = [
   "./",
@@ -44,26 +49,35 @@ self.addEventListener("fetch", function (e) {
   var isFont = url.host === "fonts.googleapis.com" || url.host === "fonts.gstatic.com";
   if (!sameOrigin && !isFont) return;
 
-  /* The page itself: NETWORK FIRST. Cache-first meant a viewer kept seeing the
-     old app for a load or more after an update, with no way to tell. Online you
-     now always get the current page; the cache catches you the moment there is
-     no signal, which is the part that actually matters on the water. */
+  /* The page itself: try the network, but never make the user wait on it.
+     Plain cache-first served a stale app after an update; plain network-first
+     hung for 10-15s on a weak signal. So: race the network against a short
+     timer, and hand over the cached app the moment the timer wins. The fetch
+     keeps running either way and refreshes the cache, so an update is still
+     never more than one open away. */
   if (req.mode === "navigate" || (sameOrigin && url.pathname.slice(-5) === ".html")) {
     e.respondWith(
-      fetch(req).then(function (res) {
-        if (res && res.ok) {
-          var copy = res.clone();
-          caches.open(CACHE).then(function (c) { c.put(req, copy); }).catch(function () {});
-        }
-        return res;
-      }).catch(function () {
-        return caches.open(CACHE).then(function (c) {
-          return c.match(req, { ignoreSearch: true }).then(function (hit) {
-            if (hit) return hit;
-            return c.match("./index.html").then(function (h2) {
-              return h2 || c.match("./");
-            });
+      caches.open(CACHE).then(function (cache) {
+        return cache.match(req, { ignoreSearch: true }).then(function (cached) {
+          var net = fetch(req).then(function (res) {
+            if (res && res.ok) cache.put(req, res.clone()).catch(function () {});
+            return res;
           });
+          e.waitUntil(net.catch(function () {}));   /* let it finish caching regardless */
+
+          if (!cached) {                            /* nothing stored yet — we must wait */
+            return net.catch(function () {
+              return cache.match("./index.html").then(function (h) {
+                return h || cache.match("./");
+              });
+            });
+          }
+          return Promise.race([
+            net.catch(function () { return cached; }),
+            new Promise(function (resolve) {
+              setTimeout(function () { resolve(cached); }, NAV_TIMEOUT);
+            })
+          ]);
         });
       })
     );
