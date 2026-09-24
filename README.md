@@ -14,7 +14,7 @@ baked into the page, so nothing is fetched at runtime.
 | --- | --- |
 | `index.html` | The whole app: markup, styles, logic, and 1,648 embedded high waters. No build step. |
 | `manifest.webmanifest` | Makes it installable — name, icons, standalone display. |
-| `sw.js` | Service worker. Caches the app so it opens offline. |
+| `sw.js` | Service worker. Network-first for the page (so an update is never more than one load away), cache-first for icons. Either way the app opens with no signal. |
 | `icons/` | App icons (192, 512, maskable, favicon). |
 | `.nojekyll` | Stops GitHub Pages running Jekyll over the files. |
 | `tools/` | Scripts to regenerate the tide table and rebuild `index.html`. Not served. |

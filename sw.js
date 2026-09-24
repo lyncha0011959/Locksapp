@@ -1,7 +1,7 @@
 /* Shinnecock Gate Clock — service worker.
    Bump CACHE when you change any file; the new version installs on the next
    online visit and takes over immediately. */
-var CACHE = "gateclock-v5";
+var CACHE = "gateclock-v7";
 
 var ASSETS = [
   "./",
@@ -44,8 +44,33 @@ self.addEventListener("fetch", function (e) {
   var isFont = url.host === "fonts.googleapis.com" || url.host === "fonts.gstatic.com";
   if (!sameOrigin && !isFont) return;
 
-  /* Cache first, revalidate in the background. The tide table is baked into
-     index.html, so a cache hit is a fully working app with the radio off. */
+  /* The page itself: NETWORK FIRST. Cache-first meant a viewer kept seeing the
+     old app for a load or more after an update, with no way to tell. Online you
+     now always get the current page; the cache catches you the moment there is
+     no signal, which is the part that actually matters on the water. */
+  if (req.mode === "navigate" || (sameOrigin && url.pathname.slice(-5) === ".html")) {
+    e.respondWith(
+      fetch(req).then(function (res) {
+        if (res && res.ok) {
+          var copy = res.clone();
+          caches.open(CACHE).then(function (c) { c.put(req, copy); }).catch(function () {});
+        }
+        return res;
+      }).catch(function () {
+        return caches.open(CACHE).then(function (c) {
+          return c.match(req, { ignoreSearch: true }).then(function (hit) {
+            if (hit) return hit;
+            return c.match("./index.html").then(function (h2) {
+              return h2 || c.match("./");
+            });
+          });
+        });
+      })
+    );
+    return;
+  }
+
+  /* Everything else (icons, manifest, fonts): cache first, refresh in background. */
   e.respondWith(
     caches.open(CACHE).then(function (cache) {
       return cache.match(req).then(function (hit) {

@@ -26,9 +26,9 @@
   --ink-3:#6B838D;
   --rule:#C2D0D5;
   --rule-2:#AEC0C6;
-  --run:#B3095F;
-  --run-ink:#8A0549;
-  --run-wash:#F7DDEA;
+  --run:#C4162A;
+  --run-ink:#A00E1F;
+  --run-wash:#FBDCDE;
   --lock:#0B6E4B;
   --lock-ink:#0A5C3F;
   --lock-wash:#D6EBE1;
@@ -52,9 +52,9 @@
     --ink-3:#71888F;
     --rule:#1D3844;
     --rule-2:#2A4C5B;
-    --run:#FF5CA8;
-    --run-ink:#FF8AC1;
-    --run-wash:#2A0D1E;
+    --run:#FF5146;
+    --run-ink:#FF8A80;
+    --run-wash:#2C0C0A;
     --lock:#3DD69A;
     --lock-ink:#6FE5B6;
     --lock-wash:#06251A;
@@ -78,9 +78,9 @@
   --ink-3:#71888F;
   --rule:#1D3844;
   --rule-2:#2A4C5B;
-  --run:#FF5CA8;
-  --run-ink:#FF8AC1;
-  --run-wash:#2A0D1E;
+  --run:#FF5146;
+  --run-ink:#FF8A80;
+  --run-wash:#2C0C0A;
   --lock:#3DD69A;
   --lock-ink:#6FE5B6;
   --lock-wash:#06251A;
@@ -443,7 +443,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   </section>
 
   <footer class="foot">
-    <span>Locks Open? v5 &middot; tide table 1&nbsp;Sep&nbsp;2026 &ndash; 31&nbsp;Dec&nbsp;2028</span>
+    <span>Locks Open? v7 &middot; tide table 1&nbsp;Sep&nbsp;2026 &ndash; 31&nbsp;Dec&nbsp;2028</span>
     <span id="swstate">Checking device storage&hellip;</span>
   </footer>
 
@@ -554,6 +554,7 @@ function dur(ms) {
 /* ---------- view state ---------- */
 var pinned = null;                 /* null = live */
 var dayAnchor = null;              /* ms inside the displayed day */
+var lastGate = null;               /* which gate drawing is on screen */
 function active(){ return pinned === null ? Date.now() : pinned; }
 
 var $ = function(id){ return document.getElementById(id); };
@@ -636,7 +637,7 @@ function renderHero() {
     $("heroEyebrow").textContent = "No prediction";
     $("heroTitle").textContent = "Out of range";
     $("heroDesc").textContent = "This app carries tide predictions from Sep 1 2026 through Dec 31 2028. Pick a time inside that window.";
-    $("heroGate").innerHTML = "";
+    $("heroGate").innerHTML = ""; lastGate = null;
     $("heroDirs").innerHTML = "";
     $("clockLab").textContent = "—"; $("clockBig").textContent = "—";
     $("atLab").textContent = "—"; $("atBig").textContent = "—";
@@ -647,7 +648,9 @@ function renderHero() {
   hero.style.setProperty("--st", st.open ? "var(--run)" : "var(--lock)");
   $("heroEyebrow").textContent = st.open ? "Gates open" : "Gates closed";
   $("heroTitle").textContent = st.open ? "Current running" : "Lock passage";
-  $("heroGate").innerHTML = gateSVG(st.open);
+  /* Only redraw when the state actually flips. Rewriting the SVG on every
+     30-second tick restarted the water animation from zero each time. */
+  if (lastGate !== st.open) { $("heroGate").innerHTML = gateSVG(st.open); lastGate = st.open; }
   $("heroDesc").textContent = st.open
     ? "Water is flowing north to south through the gate openings, building to about 6 knots at peak."
     : "The gates are shut. Traffic passes through the lock chamber.";
