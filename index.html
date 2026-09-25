@@ -171,8 +171,10 @@ body{
 .gate .guide{stroke:var(--steel);stroke-width:9;stroke-linecap:round;fill:none}
 .gate .glass{fill:var(--glass)}
 .gate .mullion{stroke:var(--teal);stroke-width:2;fill:none;opacity:.7}
-.gate .noentry{fill:var(--run);stroke:var(--card);stroke-width:3}
-.gate .noentryBar{stroke:#fff;stroke-width:4.5;stroke-linecap:round}
+.gate .routeAlt{stroke:var(--route);stroke-width:8;stroke-linecap:round;fill:none;stroke-dasharray:15 12;opacity:.9}
+.gate .caution{fill:var(--run);stroke:var(--card);stroke-width:2.5;stroke-linejoin:round}
+.gate .cautionBang{stroke:#fff;stroke-width:3.5;stroke-linecap:round}
+.gate .cautionDot{fill:#fff}
 .gate .bayLab{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;fill:var(--ink-2);letter-spacing:.1em;stroke:var(--card);stroke-width:5;paint-order:stroke fill}
 .gate .compass{fill:var(--ink-3)}
 .gate .compassStem{stroke:var(--ink-3);stroke-width:3;stroke-linecap:round;fill:none}
@@ -200,6 +202,16 @@ body{
   .gate .rushWrap,.gate .calmWrap{animation:none}
 }
 
+.cur{
+  display:flex;align-items:center;gap:12px;padding:11px 12px;border-radius:2px;
+  background:var(--sunk);border-left:3px solid var(--curcol);
+}
+.cur .meter{display:flex;gap:4px;flex:none}
+.cur .meter i{width:16px;height:16px;border-radius:2px;background:var(--rule-2)}
+.cur .meter i.on{background:var(--curcol)}
+.cur .txt{display:flex;flex-direction:column;gap:2px;min-width:0}
+.cur .txt b{font-size:15px;font-weight:600;color:var(--curcol);line-height:1.2}
+.cur .txt span{font-size:12.5px;color:var(--ink-2);line-height:1.35}
 .clockrow{
   display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
   margin-top:2px;padding-top:15px;border-top:1px dashed var(--rule-2);
@@ -431,6 +443,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
       <div id="heroGate"></div>
       <p id="heroDesc"></p>
       <div class="dirs" id="heroDirs"></div>
+      <div id="heroCurrent"></div>
       <div class="clockrow">
         <div>
           <span class="eyebrow lab" id="clockLab">Changes in</span>
@@ -522,7 +535,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   </section>
 
   <footer class="foot">
-    <span>Shinnecock Locks &middot; Locks Open? v10</span>
+    <span>Shinnecock Locks &middot; Locks Open? v12</span>
     <span id="swstate">Checking device storage&hellip;</span>
   </footer>
 
@@ -791,9 +804,14 @@ function gateSVG(open) {
   }
   if (open) {
     s += lane(173, true, 44, 252);                       /* southbound rides the middle gate */
-    /* no sheltered way north while everything is flushing */
-    s += '<circle class="noentry" cx="318" cy="52" r="15"/>' +
-         '<path class="noentryBar" d="M310 52 H326"/>';
+    /* northbound still goes by the lock, but with nothing to lock into and the
+       set on the nose — dashed, and flagged, rather than a clean lane */
+    s += '<path class="routeCase" d="M318 60 V252"/>' +
+         '<path class="routeAlt"  d="M318 60 V252"/>' +
+         '<path class="routeHead" d="M318 45 L309 63 L327 63 Z"/>';
+    s += '<path class="caution" d="M318 12 L334 40 L302 40 Z"/>' +
+         '<path class="cautionBang" d="M318 22 V31"/>' +
+         '<circle class="cautionDot" cx="318" cy="35.5" r="1.8"/>';
   } else {
     s += lane(306, false, 48, 252) + lane(330, true, 48, 252);
   }
@@ -809,6 +827,42 @@ function gateSVG(open) {
   return s;
 }
 
+/* ---------- how hard it is running ----------
+   Derived from NOAA predicted water level either side of the canal (Ponquoque
+   Point on the Shinnecock side, South Jamesport on the Peconic side) across 38
+   open windows. Head difference follows a consistent hump: near nothing at the
+   opening, peaking about 40% through, gone again before the gates shut. Peak
+   scales with the size of the tide. Velocity goes as the square root of head,
+   so this is a relative index, not knots. */
+var HEAD_SHAPE = [0.104, 0.435, 0.712, 0.909, 1.000, 0.985, 0.868, 0.665, 0.398, 0.087, 0.000];
+var HEAD_REF = 1.466;                       /* sqrt of the mean peak head */
+function peakHead(hwFt) { return Math.max(0.4, 0.813 * hwFt - 1.757); }
+function shapeAt(f) {
+  if (f <= 0) return HEAD_SHAPE[0];
+  if (f >= 1) return HEAD_SHAPE[10];
+  var x = f * 10, i = Math.floor(x), r = x - i;
+  return HEAD_SHAPE[i] + (HEAD_SHAPE[i + 1] - HEAD_SHAPE[i]) * r;
+}
+/* relative strength 0..~1.15 at a moment inside an open window */
+function strengthAt(ms, st) {
+  if (!st || st.out || !st.open) return null;
+  var f = (ms - st.since) / (st.until - st.since);
+  var head = peakHead(st.hw ? st.hw.h : 5.0) * shapeAt(f);
+  return { f: f, rel: Math.sqrt(Math.max(head, 0)) / HEAD_REF };
+}
+function band(rel) { return rel < 0.45 ? 0 : (rel < 0.80 ? 1 : 2); }
+var BAND_NAME = ["Light", "Moderate", "Strong"];
+/* when inside this window does it next drop to Light, and for how long */
+function easesAt(st) {
+  if (!st || st.out || !st.open) return null;
+  var L = st.until - st.since, step = L / 120, t, s;
+  for (t = Date.now() + step; t < st.until; t += step) {
+    s = strengthAt(t, st);
+    if (s && band(s.rel) === 0) return t;
+  }
+  return null;
+}
+
 /* ---------- hero ---------- */
 function renderHero() {
   var ms = active(), st = stateAt(ms), hero = $("hero"), mode = $("heroMode");
@@ -821,6 +875,7 @@ function renderHero() {
     $("heroTitle").textContent = "Out of range";
     $("heroDesc").textContent = "This app carries tide predictions from Sep 1 2026 through Dec 31 2028. Pick a time inside that window.";
     $("heroGate").innerHTML = ""; lastGate = null;
+    $("heroCurrent").innerHTML = "";
     $("heroDirs").innerHTML = "";
     $("clockLab").textContent = "—"; $("clockBig").textContent = "—";
     $("atLab").textContent = "—"; $("atBig").textContent = "—";
@@ -834,14 +889,39 @@ function renderHero() {
   /* Only redraw when the state actually flips. Rewriting the SVG on every
      30-second tick restarted the water animation from zero each time. */
   if (lastGate !== st.open) { $("heroGate").innerHTML = gateSVG(st.open); lastGate = st.open; }
-  $("heroDesc").textContent = st.open
-    ? "Water is flowing north to south through the gate openings, building to about 6 knots at peak."
-    : "The gates are shut. Traffic passes through the lock chamber.";
+  var sNow = strengthAt(ms, st), bNow = sNow ? band(sNow.rel) : -1;
+  $("heroDesc").textContent = !st.open
+    ? "The gates are shut. Traffic passes through the lock chamber."
+    : bNow === 2 ? "Water is running north to south through the gate openings at or near its peak \u2014 call it 6 knots."
+    : bNow === 1 ? (sNow.f < 0.45
+        ? "Water is running north to south through the gate openings and still building."
+        : "Water is still running north to south through the gate openings, but easing.")
+    : "The gates are open, but the head driving the flush has nearly gone. The set is light for now.";
 
   $("heroDirs").innerHTML = st.open
     ? '<div class="dir"><b>Northbound</b><span>No sheltered passage &mdash; the lock stands open too. Wait for the gates to shut, or take the full set on the nose.</span></div>' +
-      '<div class="dir"><b>Southbound</b><span>Middle tidal gate, between the flared guidewalls. With the current, fast and committed.</span></div>'
+      '<div class="dir"><b>Southbound</b><span>Middle tidal gate, between the flared guidewalls. ' +
+      (bNow === 0 ? 'Easy water, but once you are in you are committed.'
+                  : 'With the current, fast and committed.') + '</span></div>'
     : '<div class="dir"><b>Both ways</b><span>Lock through on the east side. One chamber, so expect to wait out opposing traffic.</span></div>';
+
+  var cur = $("heroCurrent");
+  if (st.open) {
+    var sN = sNow, bi = bNow;
+    var col = ["var(--lock)", "#C98A00", "var(--run)"][bi];
+    var ease = easesAt(st), lite = "";
+    if (bi === 0) lite = sN.f < 0.5
+      ? "Easiest water of this window \u2014 it builds quickly from here."
+      : "Easiest water of this window \u2014 holds until the gates shut.";
+    else if (ease) lite = "Eases off around " + hhmm(ease) + ".";
+    else lite = "Stays up until the gates shut.";
+    cur.innerHTML = '<div class="cur" style="--curcol:' + col + '">' +
+      '<span class="meter">' +
+        '<i class="on"></i>' + (bi > 0 ? '<i class="on"></i>' : '<i></i>') +
+        (bi > 1 ? '<i class="on"></i>' : '<i></i>') +
+      '</span>' +
+      '<span class="txt"><b>' + BAND_NAME[bi] + ' current</b><span>' + lite + '</span></span></div>';
+  } else { cur.innerHTML = ""; }
 
   $("clockLab").textContent = st.open ? "Gates close in" : "Gates open in";
   $("clockBig").textContent = dur(st.until - ms);
