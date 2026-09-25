@@ -1,7 +1,7 @@
 /* Shinnecock Gate Clock — service worker.
    Bump CACHE when you change any file; the new version installs on the next
    online visit and takes over immediately. */
-var CACHE = "gateclock-v9";
+var CACHE = "gateclock-v10";
 
 /* How long to wait on the network before giving up and drawing the cached app.
    A marginal signal can leave a fetch hanging far longer than a boater will

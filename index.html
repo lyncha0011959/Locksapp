@@ -41,6 +41,7 @@
   --steel:#8FA3AC;
   --teal:#129C99;
   --route:#15629E;
+  --glass:#DDEFF1;
   --shadow:0 1px 2px rgba(12,29,37,.08), 0 6px 18px -10px rgba(12,29,37,.28);
 }
 @media (prefers-color-scheme: dark){
@@ -68,7 +69,9 @@
     --steel:#3C5867;
     --teal:#12807E;
   --route:#63B8E8;
+  --glass:#1C5E5C;
     --route:#63B8E8;
+    --glass:#1C5E5C;
     --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -12px rgba(0,0,0,.8);
   }
 }
@@ -165,6 +168,12 @@ body{
 .gate .route{stroke:var(--route);stroke-width:8;stroke-linecap:round;fill:none}
 .gate .routeHead{fill:var(--route);stroke:var(--card);stroke-width:2.5;stroke-linejoin:round}
 .gate .lockgate{fill:var(--steel)}
+.gate .guide{stroke:var(--steel);stroke-width:9;stroke-linecap:round;fill:none}
+.gate .glass{fill:var(--glass)}
+.gate .mullion{stroke:var(--teal);stroke-width:2;fill:none;opacity:.7}
+.gate .noentry{fill:var(--run);stroke:var(--card);stroke-width:3}
+.gate .noentryBar{stroke:#fff;stroke-width:4.5;stroke-linecap:round}
+.gate .bayLab{font-family:"IBM Plex Mono",monospace;font-size:12px;font-weight:600;fill:var(--ink-2);letter-spacing:.1em;stroke:var(--card);stroke-width:5;paint-order:stroke fill}
 .gate .compass{fill:var(--ink-3)}
 .gate .compassStem{stroke:var(--ink-3);stroke-width:3;stroke-linecap:round;fill:none}
 .gate .sky{fill:var(--sky)}
@@ -177,13 +186,13 @@ body{
 .gate .seam{stroke:var(--card);stroke-width:2;opacity:.55}
 .gate .rail{stroke:var(--steel);stroke-width:3;fill:none}
 .gate .chain{stroke:var(--steel);stroke-width:2;opacity:.8;fill:none}
-.gate .rush{stroke:var(--st);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.gate .rush{stroke:var(--st);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .gate .ripple{stroke:var(--ink-3);stroke-width:2.5;stroke-linecap:round;fill:none;opacity:.4}
 .gate text{
   font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:500;
   fill:var(--ink-3);letter-spacing:.12em;opacity:.85;
 }
-@keyframes gcRush{to{transform:translateY(30px)}}
+@keyframes gcRush{to{transform:translateY(46px)}}
 @keyframes gcBob{0%,100%{transform:translateY(0)}50%{transform:translateY(2.5px)}}
 .gate .rushWrap{animation:gcRush 1.05s linear infinite}
 .gate .calmWrap{animation:gcBob 5s ease-in-out infinite}
@@ -502,7 +511,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     <h3>Notes to mariners</h3>
     <dl>
       <dt>Passage</dt>
-      <dd>Northbound uses the <b>east gate</b> in all conditions. Southbound uses the east gate when locking through, and the <b>middle gate</b> when the gates are open and the current is running.</dd>
+      <dd>Four openings: three tidal gates and the powered lock against the east wall. With the gates shut, everything locks through on the east. With them open the lock stands open too, so the only passage is southbound, through the <b>middle tidal gate</b> between the flared guidewalls. There is no protected way north until the gates shut.</dd>
       <dt>Timing</dt>
       <dd>Gate state is predicted from published NOAA tide data using a fixed offset to local high water. A closed window of six hours alternates with roughly six and a half hours open.</dd>
       <dt>On scene</dt>
@@ -513,7 +522,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   </section>
 
   <footer class="foot">
-    <span>Shinnecock Locks &middot; Locks Open? v9</span>
+    <span>Shinnecock Locks &middot; Locks Open? v10</span>
     <span id="swstate">Checking device storage&hellip;</span>
   </footer>
 
@@ -684,64 +693,93 @@ var $ = function(id){ return document.getElementById(id); };
    Fixed structure (walls, catwalk, control house) stays put; only the leaves
    and the water change. Open = clear channel with the set coming at you.      */
 function gateSVG(open) {
-  var s = '<svg class="gate" viewBox="0 0 440 280" role="img" aria-label="' +
-          (open ? "Overhead view, north up. Gates open: water runs south through the west and middle bays. Northbound traffic uses the east lock, southbound uses the middle bay."
-                : "Overhead view, north up. Gates shut: all traffic uses the east lock.") + '">';
+  /* west to east: three tidal gates, then the powered lock against the east wall.
+     Southbound with the current runs the middle tidal gate, the one with the
+     flared guidewalls. When the gates are open the lock stands open too, so
+     there is no sheltered way north — that is the whole point of the warning. */
+  var BAYS = [
+    { x0: 72,  x1: 124, kind: "tidal" },
+    { x0: 142, x1: 204, kind: "middle" },
+    { x0: 222, x1: 274, kind: "tidal" },
+    { x0: 292, x1: 344, kind: "lock" }
+  ];
+  var BAND0 = 118, BAND1 = 168, WL = 356;
 
-  s += '<defs>' +
-       '<clipPath id="bayW"><rect x="92"  y="44" width="60" height="182"/></clipPath>' +
-       '<clipPath id="bayM"><rect x="176" y="44" width="72" height="182"/></clipPath>' +
-       '</defs>';
+  var s = '<svg class="gate" viewBox="0 0 440 280" role="img" aria-label="' +
+          (open ? "Overhead view, north up. Gates open: the current runs south through all four openings and the lock stands open. Southbound uses the middle tidal gate; there is no protected passage north."
+                : "Overhead view, north up. Gates shut: all traffic locks through on the east side.") + '">';
+
+  s += '<defs>';
+  for (var d = 0; d < BAYS.length; d++)
+    s += '<clipPath id="bay' + d + '"><rect x="' + BAYS[d].x0 + '" y="40" width="' +
+         (BAYS[d].x1 - BAYS[d].x0) + '" height="186"/></clipPath>';
+  s += '</defs>';
 
   /* canal and banks */
   s += '<rect class="near" x="0" y="0" width="440" height="280"/>' +
-       '<rect class="conc" x="0"   y="0" width="70" height="280"/>' +
-       '<rect class="conc" x="370" y="0" width="70" height="280"/>';
+       '<rect class="conc" x="0" y="0" width="54" height="280"/>' +
+       '<rect class="conc" x="' + WL + '" y="0" width="' + (440 - WL) + '" height="280"/>';
 
-  /* the set, running south through whichever bays are open */
+  /* with the gates open every opening flushes, the lock included */
   if (open) {
-    s += '<g clip-path="url(#bayW)"><g class="rushWrap">';
-    for (var y = 40; y <= 250; y += 30)
-      s += '<path class="rush" d="M100 ' + y + ' L122 ' + (y + 14) + ' L144 ' + y + '"/>';
-    s += '</g></g><g clip-path="url(#bayM)"><g class="rushWrap">';
-    for (var y2 = 40; y2 <= 250; y2 += 30)
-      s += '<path class="rush" d="M184 ' + y2 + ' L212 ' + (y2 + 14) + ' L240 ' + y2 + '"/>';
-    s += '</g></g>';
+    for (var i = 0; i < BAYS.length; i++) {
+      var b = BAYS[i], cx = (b.x0 + b.x1) / 2, hw = (b.x1 - b.x0) / 2 - 5;
+      s += '<g clip-path="url(#bay' + i + ')"><g class="rushWrap">';
+      for (var y = 30; y <= 250; y += 46)
+        s += '<path class="rush" d="M' + (cx - hw) + ' ' + y + ' L' + cx + ' ' + (y + 13) +
+             ' L' + (cx + hw) + ' ' + y + '"/>';
+      s += '</g></g>';
+    }
   }
 
   /* abutments and piers */
-  s += '<rect class="steel" x="70"  y="118" width="22" height="50"/>' +
-       '<rect class="steel" x="152" y="118" width="24" height="50"/>' +
-       '<rect class="steel" x="248" y="118" width="24" height="50"/>' +
-       '<rect class="steel" x="332" y="118" width="38" height="50"/>';
+  var edges = [[54, 72], [124, 142], [204, 222], [274, 292], [344, WL]];
+  for (var e = 0; e < edges.length; e++)
+    s += '<rect class="steel" x="' + edges[e][0] + '" y="' + BAND0 + '" width="' +
+         (edges[e][1] - edges[e][0]) + '" height="' + (BAND1 - BAND0) + '"/>';
 
-  /* west and middle gates: shut or standing open */
-  if (open) {
-    s += '<rect class="leaf" x="92"  y="118" width="9" height="50"/>' +
-         '<rect class="leaf" x="143" y="118" width="9" height="50"/>' +
-         '<rect class="leaf" x="176" y="118" width="9" height="50"/>' +
-         '<rect class="leaf" x="239" y="118" width="9" height="50"/>';
-  } else {
-    s += '<rect class="leaf" x="92"  y="128" width="60" height="30"/>' +
-         '<rect class="leaf" x="176" y="128" width="72" height="30"/>';
+  /* flared guidewalls funnelling into the middle tidal gate from the north */
+  s += '<path class="guide" d="M142 ' + BAND0 + ' L112 72"/>' +
+       '<path class="guide" d="M204 ' + BAND0 + ' L234 72"/>';
+
+  /* the gates themselves */
+  for (var g = 0; g < BAYS.length; g++) {
+    var bb = BAYS[g], w = bb.x1 - bb.x0;
+    if (bb.kind === "lock") continue;
+    if (open) {
+      s += '<rect class="leaf" x="' + bb.x0 + '" y="' + BAND0 + '" width="8" height="' + (BAND1 - BAND0) + '"/>' +
+           '<rect class="leaf" x="' + (bb.x1 - 8) + '" y="' + BAND0 + '" width="8" height="' + (BAND1 - BAND0) + '"/>';
+    } else {
+      s += '<rect class="leaf" x="' + bb.x0 + '" y="' + (BAND0 + 10) + '" width="' + w + '" height="30"/>';
+    }
   }
 
-  /* east bay is the lock: chamber walls, a gate at each end */
-  s += '<rect class="steel" x="268" y="86" width="6" height="112"/>' +
-       '<rect class="steel" x="330" y="86" width="6" height="112"/>' +
-       '<rect class="lockgate" x="274" y="114" width="56" height="10"/>' +
-       '<rect class="lockgate" x="274" y="162" width="56" height="10"/>';
+  /* the powered lock: chamber walls and a gate at each end */
+  s += '<rect class="steel" x="288" y="84" width="5" height="94"/>' +
+       '<rect class="steel" x="344" y="84" width="5" height="94"/>';
+  if (open) {
+    s += '<rect class="lockgate" x="293" y="110" width="8" height="10"/>' +
+         '<rect class="lockgate" x="336" y="110" width="8" height="10"/>' +
+         '<rect class="lockgate" x="293" y="156" width="8" height="10"/>' +
+         '<rect class="lockgate" x="336" y="156" width="8" height="10"/>';
+  } else {
+    s += '<rect class="lockgate" x="293" y="110" width="51" height="10"/>' +
+         '<rect class="lockgate" x="293" y="156" width="51" height="10"/>';
+  }
 
   /* highway bridge, south of the locks */
   s += '<rect class="steel" x="0" y="226" width="440" height="13"/>' +
-       '<rect class="conc"  x="160" y="222" width="13" height="21"/>' +
-       '<rect class="conc"  x="252" y="222" width="13" height="21"/>';
+       '<rect class="conc" x="148" y="222" width="13" height="21"/>' +
+       '<rect class="conc" x="248" y="222" width="13" height="21"/>';
 
-  /* operator's house on the east bank */
-  s += '<rect class="steel" x="374" y="120" width="52" height="8"/>' +
-       '<rect class="teal"  x="378" y="128" width="44" height="32"/>';
+  /* operator's house: raised glazed cab on the east wall, overlooking the lock */
+  s += '<rect class="steel" x="' + (WL + 2) + '" y="88" width="80" height="11"/>' +
+       '<rect class="teal"  x="' + (WL + 8) + '" y="99" width="68" height="74"/>' +
+       '<rect class="glass" x="' + (WL + 12) + '" y="108" width="60" height="38"/>';
+  for (var m = 1; m <= 3; m++)
+    s += '<path class="mullion" d="M' + (WL + 12 + m * 15) + ' 108 V146"/>';
 
-  /* routes, cased so they read over the current */
+  /* routes */
   function lane(x, south, a, b) {
     var tip = south ? b : a;
     var head = south
@@ -751,14 +789,21 @@ function gateSVG(open) {
            '<path class="route"     d="M' + x + ' ' + a + ' V' + b + '"/>' +
            '<path class="routeHead" d="' + head + '"/>';
   }
-  s += lane(292, false, 52, 256);                       /* northbound always locks through */
-  s += open ? lane(212, true, 48, 252)                  /* southbound rides the middle bay */
-            : lane(312, true, 52, 256);                 /* southbound locks through too */
+  if (open) {
+    s += lane(173, true, 44, 252);                       /* southbound rides the middle gate */
+    /* no sheltered way north while everything is flushing */
+    s += '<circle class="noentry" cx="318" cy="52" r="15"/>' +
+         '<path class="noentryBar" d="M310 52 H326"/>';
+  } else {
+    s += lane(306, false, 48, 252) + lane(330, true, 48, 252);
+  }
 
-  /* compass */
-  s += '<path class="compass" d="M36 22 L28 40 L44 40 Z"/>' +
-       '<path class="compassStem" d="M36 40 V64"/>' +
-       '<text x="36" y="84" text-anchor="middle">N</text>';
+  /* labels and compass */
+  s += '<text class="bayLab" x="173" y="196" text-anchor="middle">MIDDLE</text>' +
+       '<text class="bayLab" x="318" y="196" text-anchor="middle">LOCK</text>';
+  s += '<path class="compass" d="M30 22 L22 40 L38 40 Z"/>' +
+       '<path class="compassStem" d="M30 40 V64"/>' +
+       '<text x="30" y="84" text-anchor="middle">N</text>';
 
   s += '</svg>';
   return s;
@@ -794,9 +839,9 @@ function renderHero() {
     : "The gates are shut. Traffic passes through the lock chamber.";
 
   $("heroDirs").innerHTML = st.open
-    ? '<div class="dir"><b>Northbound</b><span>East gate &mdash; lock through. Do not try the open bays against the set.</span></div>' +
-      '<div class="dir"><b>Southbound</b><span>Middle gate, running with the current. Fast and committed.</span></div>'
-    : '<div class="dir"><b>Both ways</b><span>East gate &mdash; lock through. One chamber, so expect to wait out opposing traffic.</span></div>';
+    ? '<div class="dir"><b>Northbound</b><span>No sheltered passage &mdash; the lock stands open too. Wait for the gates to shut, or take the full set on the nose.</span></div>' +
+      '<div class="dir"><b>Southbound</b><span>Middle tidal gate, between the flared guidewalls. With the current, fast and committed.</span></div>'
+    : '<div class="dir"><b>Both ways</b><span>Lock through on the east side. One chamber, so expect to wait out opposing traffic.</span></div>';
 
   $("clockLab").textContent = st.open ? "Gates close in" : "Gates open in";
   $("clockBig").textContent = dur(st.until - ms);
