@@ -1,18 +1,37 @@
 {
   "name": "Locks Open?",
   "short_name": "Locks Open?",
-  "description": "Predicts when the Shinnecock Canal tide gates are open or closed, from NOAA Sandy Hook high water. Works with no signal.",
+  "description": "Is the Shinnecock Canal lock open or closed? Live gate status, current strength, and passage routing.",
   "start_url": "./",
   "scope": "./",
-  "id": "shinnecock-gate-clock",
+  "id": "/Locksapp/",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#07131A",
   "theme_color": "#07131A",
-  "categories": ["navigation", "utilities", "weather"],
+  "categories": [
+    "navigation",
+    "utilities",
+    "weather"
+  ],
   "icons": [
-    { "src": "./icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "./icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "./icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
