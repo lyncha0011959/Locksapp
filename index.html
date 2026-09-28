@@ -171,7 +171,6 @@ body{
 .gate .guide{stroke:var(--steel);stroke-width:9;stroke-linecap:round;fill:none}
 .gate .glass{fill:var(--glass)}
 .gate .mullion{stroke:var(--teal);stroke-width:2;fill:none;opacity:.7}
-.gate .routeAlt{stroke:var(--route);stroke-width:8;stroke-linecap:round;fill:none;stroke-dasharray:15 12;opacity:.9}
 .gate .caution{fill:var(--run);stroke:var(--card);stroke-width:2.5;stroke-linejoin:round}
 .gate .cautionBang{stroke:#fff;stroke-width:3.5;stroke-linecap:round}
 .gate .cautionDot{fill:#fff}
@@ -382,6 +381,22 @@ input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outlin
   animation:gcSlide 1.1s ease-in-out infinite}
 @keyframes gcSlide{0%{transform:translateX(-115%)}100%{transform:translateX(330%)}}
 
+.modal{
+  position:fixed;inset:0;z-index:60;background:rgba(6,18,25,.6);
+  display:flex;align-items:center;justify-content:center;padding:22px;
+}
+.modalCard{
+  background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--run);
+  border-radius:4px;box-shadow:var(--shadow);padding:20px;max-width:360px;width:100%;
+  display:flex;flex-direction:column;gap:13px;
+}
+.modalEyebrow{
+  font-family:"IBM Plex Mono",monospace;font-size:11px;font-weight:500;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--ink-3);
+}
+.modalBody{margin:0;font-size:16.5px;line-height:1.45;color:var(--ink)}
+.modalSub{margin:0;font-family:"IBM Plex Mono",monospace;font-size:13px;color:var(--ink-2)}
+.modalOk{align-self:flex-end;min-width:104px;text-align:center}
 .sponsorline{
   display:flex;align-items:center;justify-content:center;gap:12px;
   padding:13px 14px;border:1px solid var(--rule);border-radius:3px;
@@ -427,6 +442,15 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     <div class="sponsorCard"><img src="data:image/png;base64,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" alt="Hampton Jitney"></div>
     <span class="splashApp">Shinnecock Locks</span>
     <div class="splashBar"><i></i></div>
+  </div>
+</div>
+
+<div class="modal" id="disclaimer" hidden>
+  <div class="modalCard" role="alertdialog" aria-labelledby="discText">
+    <span class="modalEyebrow">Before you go</span>
+    <p class="modalBody" id="discText">Prediction only &mdash; not for navigation. Confirm on scene or by contacting the lock operator.</p>
+    <p class="modalSub">Lock operator &middot; VHF&nbsp;13 &middot; 631&#8209;852&#8209;8299</p>
+    <button class="btn modalOk" id="disclaimerOk">OK</button>
   </div>
 </div>
 
@@ -535,7 +559,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   </section>
 
   <footer class="foot">
-    <span>Shinnecock Locks &middot; Locks Open? v12</span>
+    <span>Shinnecock Locks &middot; Locks Open? v13</span>
     <span id="swstate">Checking device storage&hellip;</span>
   </footer>
 
@@ -807,7 +831,7 @@ function gateSVG(open) {
     /* northbound still goes by the lock, but with nothing to lock into and the
        set on the nose — dashed, and flagged, rather than a clean lane */
     s += '<path class="routeCase" d="M318 60 V252"/>' +
-         '<path class="routeAlt"  d="M318 60 V252"/>' +
+         '<path class="route"     d="M318 60 V252"/>' +
          '<path class="routeHead" d="M318 45 L309 63 L327 63 Z"/>';
     s += '<path class="caution" d="M318 12 L334 40 L302 40 Z"/>' +
          '<path class="cautionBang" d="M318 22 V31"/>' +
@@ -1042,9 +1066,20 @@ function hideSplash() {
   splashGone = true;
   var el = $("splash");
   el.className = "splash gone";
-  setTimeout(function () { el.hidden = true; }, 420);
+  setTimeout(function () { el.hidden = true; showDisclaimer(); }, 420);
+}
+function showDisclaimer() {
+  var d = $("disclaimer");
+  if (!d || !d.hidden) return;
+  d.hidden = false;
+  var ok = $("disclaimerOk");
+  if (ok) ok.focus();
 }
 $("splash").addEventListener("click", hideSplash);
+$("disclaimerOk").addEventListener("click", function () { $("disclaimer").hidden = true; });
+$("disclaimer").addEventListener("keydown", function (e) {
+  if (e.key === "Escape" || e.key === "Enter") $("disclaimer").hidden = true;
+});
 /* dismiss once the data has settled, but hold it long enough to actually be seen */
 function splashReady() {
   setTimeout(hideSplash, Math.max(0, 1500 - (Date.now() - splashAt)));
