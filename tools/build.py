@@ -15,7 +15,7 @@ import pathlib
 
 ROOT = pathlib.Path(__file__).resolve().parent
 OUT = ROOT.parent
-VERSION = "v17.1"
+VERSION = "v17.2"
 
 # ---- sponsor -----------------------------------------------------------------
 # To change sponsor: drop a new logo at gateclock/sponsor/logo.png (transparent
