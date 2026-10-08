@@ -1,12 +1,13 @@
 <!doctype html>
+<!-- (c) 2026 Andrew Lynch. All rights reserved. No permission is granted to reproduce, modify, distribute or use this source code without prior written permission. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Is the Shinnecock Canal lock open or closed? Live gate status, next change, and passage routing for the Shinnecock Locks.">
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#E6ECEE" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#07131A" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F5F6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B1419" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="./icons/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -18,86 +19,86 @@
 <link id="webfonts" rel="stylesheet" media="print" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 :root{
-  --paper:#E6ECEE;
-  --card:#F4F7F8;
-  --sunk:#DAE3E6;
-  --ink:#0C1D25;
-  --ink-2:#3D5560;
-  --ink-3:#6B838D;
-  --rule:#C2D0D5;
-  --rule-2:#AEC0C6;
-  --run:#C4162A;
-  --run-ink:#A00E1F;
-  --run-wash:#FBDCDE;
-  --lock:#0B6E4B;
-  --lock-ink:#0A5C3F;
-  --lock-wash:#D6EBE1;
-  --accent:#2C6079;
-  --focus:#2C6079;
-  --land:#C7D3D6;
-  --water:#9FBED0;
-  --water-far:#B9D0DB;
-  --sky:#CBDEE9;
-  --steel:#8FA3AC;
-  --teal:#129C99;
-  --route:#15629E;
-  --glass:#DDEFF1;
-  --shadow:0 1px 2px rgba(12,29,37,.08), 0 6px 18px -10px rgba(12,29,37,.28);
+  --paper:#F2F5F6;
+  --card:#FFFFFF;
+  --sunk:#E6ECEE;
+  --ink:#08161C;
+  --ink-2:#26404B;
+  --ink-3:#4A626C;
+  --rule:#C3D0D5;
+  --rule-2:#97ABB3;
+  --run:#C0102A;
+  --run-ink:#9A0A1D;
+  --run-wash:#FDE2E5;
+  --lock:#06714C;
+  --lock-ink:#055A3C;
+  --lock-wash:#DAF0E5;
+  --accent:#1B5672;
+  --focus:#1B5672;
+  --land:#D9D3C4;
+  --water:#86B6D2;
+  --water-far:#ADCDE0;
+  --sky:#D3E4EE;
+  --steel:#556973;
+  --teal:#0E8683;
+  --route:#0B4A84;
+  --glass:#E6F5F7;
+  --shadow:0 1px 2px rgba(8,22,28,.08), 0 6px 18px -10px rgba(8,22,28,.28);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#07131A;
-    --card:#0E212B;
-    --sunk:#0A1A22;
-    --ink:#E4EEF2;
-    --ink-2:#A2B7C0;
-    --ink-3:#71888F;
-    --rule:#1D3844;
-    --rule-2:#2A4C5B;
-    --run:#FF5146;
-    --run-ink:#FF8A80;
-    --run-wash:#2C0C0A;
-    --lock:#3DD69A;
-    --lock-ink:#6FE5B6;
-    --lock-wash:#06251A;
-    --accent:#7FC2DE;
-    --focus:#7FC2DE;
-    --land:#16303C;
-    --water:#0D2836;
-    --water-far:#123243;
-    --sky:#0A2231;
-    --steel:#3C5867;
-    --teal:#12807E;
-  --route:#63B8E8;
-  --glass:#1C5E5C;
-    --route:#63B8E8;
-    --glass:#1C5E5C;
+    --paper:#0B1419;
+    --card:#15232B;
+    --sunk:#0F1C23;
+    --ink:#F2F7F9;
+    --ink-2:#C6D4DA;
+    --ink-3:#98ADB6;
+    --rule:#2B414C;
+    --rule-2:#416070;
+    --run:#FF645B;
+    --run-ink:#FF9E96;
+    --run-wash:#3A1513;
+    --lock:#47DDA2;
+    --lock-ink:#82ECC3;
+    --lock-wash:#0D3024;
+    --accent:#92CFEA;
+    --focus:#92CFEA;
+    --land:#495356;
+    --water:#163F58;
+    --water-far:#1D4B66;
+    --sky:#0F2837;
+    --steel:#8DA2AD;
+    --teal:#1FA29E;
+    --route:#86CEF5;
+    --glass:#2E807C;
     --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -12px rgba(0,0,0,.8);
   }
 }
 :root[data-theme="dark"]{
-  --paper:#07131A;
-  --card:#0E212B;
-  --sunk:#0A1A22;
-  --ink:#E4EEF2;
-  --ink-2:#A2B7C0;
-  --ink-3:#71888F;
-  --rule:#1D3844;
-  --rule-2:#2A4C5B;
-  --run:#FF5146;
-  --run-ink:#FF8A80;
-  --run-wash:#2C0C0A;
-  --lock:#3DD69A;
-  --lock-ink:#6FE5B6;
-  --lock-wash:#06251A;
-  --accent:#7FC2DE;
-  --focus:#7FC2DE;
-  --land:#16303C;
-  --water:#0D2836;
-  --water-far:#123243;
-  --sky:#0A2231;
-  --steel:#3C5867;
-  --teal:#12807E;
+  --paper:#0B1419;
+  --card:#15232B;
+  --sunk:#0F1C23;
+  --ink:#F2F7F9;
+  --ink-2:#C6D4DA;
+  --ink-3:#98ADB6;
+  --rule:#2B414C;
+  --rule-2:#416070;
+  --run:#FF645B;
+  --run-ink:#FF9E96;
+  --run-wash:#3A1513;
+  --lock:#47DDA2;
+  --lock-ink:#82ECC3;
+  --lock-wash:#0D3024;
+  --accent:#92CFEA;
+  --focus:#92CFEA;
+  --land:#495356;
+  --water:#163F58;
+  --water-far:#1D4B66;
+  --sky:#0F2837;
+  --steel:#8DA2AD;
+  --teal:#1FA29E;
+  --route:#86CEF5;
+  --glass:#2E807C;
   --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -12px rgba(0,0,0,.8);
 }
 
@@ -187,7 +188,7 @@ body{
 .gate .seam{stroke:var(--card);stroke-width:2;opacity:.55}
 .gate .rail{stroke:var(--steel);stroke-width:3;fill:none}
 .gate .chain{stroke:var(--steel);stroke-width:2;opacity:.8;fill:none}
-.gate .rush{stroke:var(--st);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.gate .rush{stroke:var(--st);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .gate .ripple{stroke:var(--ink-3);stroke-width:2.5;stroke-linecap:round;fill:none;opacity:.4}
 .gate text{
   font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:500;
@@ -351,6 +352,7 @@ input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outlin
 @media (prefers-reduced-motion:reduce){.about .chev{transition:none}}
 .notes .warn{color:var(--run-ink);font-weight:500}
 .notes a{color:var(--accent)}
+.notes .copy{font-size:12px;color:var(--ink-3);line-height:1.5;padding-top:10px;border-top:1px solid var(--rule)}
 
 /* ---------- sponsor: opening card and persistent credit ---------- */
 .splash{
@@ -482,6 +484,11 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     </div>
   </section>
 
+  <a class="sponsorline" href="https://www.hamptonjitney.com/" target="_blank" rel="noopener">
+    <span>Presented by</span>
+    <span class="badge"><img src="data:image/png;base64,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" alt="Hampton Jitney"></span>
+  </a>
+
   <section class="sec">
     <span class="eyebrow">Day view</span>
     <div class="strip">
@@ -521,11 +528,6 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     </div>
   </section>
 
-  <a class="sponsorline" href="https://www.hamptonjitney.com/" target="_blank" rel="noopener">
-    <span>Presented by</span>
-    <span class="badge"><img src="data:image/png;base64,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" alt="Hampton Jitney"></span>
-  </a>
-
   <p class="warnline">Prediction only &mdash; not for navigation. Confirm on scene or on VHF&nbsp;13.</p>
 
   <details class="about">
@@ -556,10 +558,11 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     </dl>
     <p class="warn">This is a prediction, not an observation. Wind and storm surge shift real tides by an hour or more, and mechanical failure or county maintenance overrides the schedule entirely &mdash; the canal has closed to all traffic on short notice before.</p>
     <p>Not for navigation. Confirm on scene or by radio before committing to the cut. Predictions have not been verified against logged gate operations; treat the timing as approximate and widen your margin near a transition.</p>
+    <p class="copy">&copy; 2026 Andrew Lynch. All rights reserved. No permission is granted to reproduce, modify, distribute or use this application or its source code without prior written permission. Tide predictions are NOAA public data; the sponsor&rsquo;s name and logo belong to the sponsor.</p>
   </section>
 
   <footer class="foot">
-    <span>Shinnecock Locks &middot; Locks Open? v14</span>
+    <span>Shinnecock Locks &middot; Locks Open? v16</span>
     <span id="swstate">Checking device storage&hellip;</span>
   </footer>
 
@@ -749,7 +752,7 @@ function gateSVG(open) {
   s += '<defs>';
   for (var d = 0; d < BAYS.length; d++)
     s += '<clipPath id="bay' + d + '"><rect x="' + BAYS[d].x0 + '" y="40" width="' +
-         (BAYS[d].x1 - BAYS[d].x0) + '" height="186"/></clipPath>';
+         (BAYS[d].x1 - BAYS[d].x0) + '" height="240"/></clipPath>';
   s += '</defs>';
 
   /* canal and banks */
@@ -760,10 +763,14 @@ function gateSVG(open) {
   /* with the gates open every opening flushes, the lock included */
   if (open) {
     for (var i = 0; i < BAYS.length; i++) {
-      var b = BAYS[i], cx = (b.x0 + b.x1) / 2, hw = (b.x1 - b.x0) / 2 - 5;
+      var b = BAYS[i], cx = (b.x0 + b.x1) / 2, half = (b.x1 - b.x0) / 2;
+      /* 15% smaller than before, then narrowed further if needed so the stroke
+         clears the open leaves (lock gates on the lock bay) by 2 px each side */
+      var inner = half - (b.kind === "lock" ? 9 : 8);
+      var hw = Math.min(0.85 * (half - 5), inner - 2.5 - 2);
       s += '<g clip-path="url(#bay' + i + ')"><g class="rushWrap">';
       for (var y = 30; y <= 250; y += 46)
-        s += '<path class="rush" d="M' + (cx - hw) + ' ' + y + ' L' + cx + ' ' + (y + 13) +
+        s += '<path class="rush" d="M' + (cx - hw) + ' ' + y + ' L' + cx + ' ' + (y + 11) +
              ' L' + (cx + hw) + ' ' + y + '"/>';
       s += '</g></g>';
     }
@@ -776,8 +783,8 @@ function gateSVG(open) {
          (edges[e][1] - edges[e][0]) + '" height="' + (BAND1 - BAND0) + '"/>';
 
   /* flared guidewalls funnelling into the middle tidal gate from the north */
-  s += '<path class="guide" d="M142 ' + BAND0 + ' L112 72"/>' +
-       '<path class="guide" d="M204 ' + BAND0 + ' L234 72"/>';
+  s += '<path class="guide" d="M142 ' + BAND0 + ' L122 72"/>' +
+       '<path class="guide" d="M204 ' + BAND0 + ' L224 72"/>';
 
   /* the gates themselves */
   for (var g = 0; g < BAYS.length; g++) {
@@ -803,11 +810,6 @@ function gateSVG(open) {
     s += '<rect class="lockgate" x="293" y="110" width="51" height="10"/>' +
          '<rect class="lockgate" x="293" y="156" width="51" height="10"/>';
   }
-
-  /* highway bridge, south of the locks */
-  s += '<rect class="steel" x="0" y="226" width="440" height="13"/>' +
-       '<rect class="conc" x="148" y="222" width="13" height="21"/>' +
-       '<rect class="conc" x="248" y="222" width="13" height="21"/>';
 
   /* operator's house: raised glazed cab on the east wall, overlooking the lock */
   s += '<rect class="steel" x="' + (WL + 2) + '" y="88" width="80" height="11"/>' +
@@ -880,7 +882,7 @@ var BAND_NAME = ["Light", "Moderate", "Strong"];
 function easesAt(st) {
   if (!st || st.out || !st.open) return null;
   var L = st.until - st.since, step = L / 120, t, s;
-  for (t = Date.now() + step; t < st.until; t += step) {
+  for (t = Math.max(active(), st.since) + step; t < st.until; t += step) {
     s = strengthAt(t, st);
     if (s && band(s.rel) === 0) return t;
   }
@@ -916,17 +918,11 @@ function renderHero() {
   var sNow = strengthAt(ms, st), bNow = sNow ? band(sNow.rel) : -1;
   $("heroDesc").textContent = !st.open
     ? "The gates are shut. Traffic passes through the lock chamber."
-    : bNow === 2 ? "Water is running north to south through the gate openings at or near its peak \u2014 call it 6 knots."
-    : bNow === 1 ? (sNow.f < 0.45
-        ? "Water is running north to south through the gate openings and still building."
-        : "Water is still running north to south through the gate openings, but easing.")
-    : "The gates are open, but the head driving the flush has nearly gone. The set is light for now.";
+    : "The gates are open. Water runs north to south through every opening.";
 
   $("heroDirs").innerHTML = st.open
-    ? '<div class="dir"><b>Northbound</b><span>No sheltered passage &mdash; the lock stands open too. Wait for the gates to shut, or take the full set on the nose.</span></div>' +
-      '<div class="dir"><b>Southbound</b><span>Middle tidal gate, between the flared guidewalls. ' +
-      (bNow === 0 ? 'Easy water, but once you are in you are committed.'
-                  : 'With the current, fast and committed.') + '</span></div>'
+    ? '<div class="dir"><b>Northbound</b><span>No sheltered passage. Wait for the gates to shut.</span></div>' +
+      '<div class="dir"><b>Southbound</b><span>Middle gate, with the current. Committed once in.</span></div>'
     : '<div class="dir"><b>Both ways</b><span>Lock through on the east side. One chamber, so expect to wait out opposing traffic.</span></div>';
 
   var cur = $("heroCurrent");
@@ -935,10 +931,10 @@ function renderHero() {
     var col = ["var(--lock)", "#C98A00", "var(--run)"][bi];
     var ease = easesAt(st), lite = "";
     if (bi === 0) lite = sN.f < 0.5
-      ? "Easiest water of this window \u2014 it builds quickly from here."
-      : "Easiest water of this window \u2014 holds until the gates shut.";
-    else if (ease) lite = "Eases off around " + hhmm(ease) + ".";
-    else lite = "Stays up until the gates shut.";
+      ? "Builds quickly from here."
+      : "Stays light until the gates shut.";
+    else if (ease) lite = "Eases around " + hhmm(ease) + ".";
+    else lite = "Until the gates shut.";
     cur.innerHTML = '<div class="cur" style="--curcol:' + col + '">' +
       '<span class="meter">' +
         '<i class="on"></i>' + (bi > 0 ? '<i class="on"></i>' : '<i></i>') +

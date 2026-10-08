@@ -117,3 +117,11 @@ It is a prediction from a tide table, not an observation of the gates.
   references Sandy Hook rather than a nearer station.
 
 Not for navigation. Lock operator monitors **VHF 13**, **631-852-8299**.
+
+---
+
+## Copyright
+
+(c) 2026 Andrew Lynch. All rights reserved.
+
+This repository is public so GitHub Pages can serve the app; that does not license it. No permission is granted to reproduce, modify, distribute or use this source code without prior written permission. Tide predictions are NOAA public data. The sponsor's name and logo belong to the sponsor.
