@@ -547,7 +547,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   </section>
 
   <footer class="foot">
-    <span>Shinnecock Locks &middot; Locks Open? v15</span>
+    <span>Shinnecock Locks &middot; Locks Open? v17</span>
     <span id="swstate">Checking device storage&hellip;</span>
   </footer>
 
@@ -825,7 +825,9 @@ function gateSVG(open) {
          '<path class="cautionBang" d="M318 22 V31"/>' +
          '<circle class="cautionDot" cx="318" cy="35.5" r="1.8"/>';
   } else {
-    s += lane(306, false, 48, 252) + lane(330, true, 48, 252);
+    /* Boats pass port to port, so each keeps to its own starboard side:
+       northbound hugs the east wall (right on the page), southbound the west. */
+    s += lane(330, false, 48, 252) + lane(306, true, 48, 252);
   }
 
   /* labels and compass */
@@ -1124,6 +1126,14 @@ fetchTides().then(function (list) {
   var SAVED = "App shell saved to this device";
   if (!("serviceWorker" in navigator)) { say("This browser can't store the app shell.", false); return; }
   say(navigator.serviceWorker.controller ? SAVED : "Saving app shell\u2026", !!navigator.serviceWorker.controller);
+  /* When a newer worker takes over an already-running app, reload once so the
+     user sees the new version immediately instead of on their next launch. */
+  var hadController = !!navigator.serviceWorker.controller, reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", function () {
+    if (!hadController || reloaded) return;   /* never on a first-ever install */
+    reloaded = true;
+    location.reload();
+  });
   window.addEventListener("load", function(){
     navigator.serviceWorker.register("./sw.js").then(function(reg){
       if (navigator.serviceWorker.controller) say(SAVED, true);

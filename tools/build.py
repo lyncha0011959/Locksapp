@@ -16,7 +16,7 @@ import re
 
 ROOT = pathlib.Path(__file__).resolve().parent
 OUT = ROOT.parent
-VERSION = "v15"
+VERSION = "v17"
 
 # ---- sponsor -----------------------------------------------------------------
 # Set SPONSOR_ENABLED = True to bring back the opening card and the credit line
@@ -87,6 +87,14 @@ SW_JS = """
   var SAVED = "App shell saved to this device";
   if (!("serviceWorker" in navigator)) { say("This browser can't store the app shell.", false); return; }
   say(navigator.serviceWorker.controller ? SAVED : "Saving app shell\\u2026", !!navigator.serviceWorker.controller);
+  /* When a newer worker takes over an already-running app, reload once so the
+     user sees the new version immediately instead of on their next launch. */
+  var hadController = !!navigator.serviceWorker.controller, reloaded = false;
+  navigator.serviceWorker.addEventListener("controllerchange", function () {
+    if (!hadController || reloaded) return;   /* never on a first-ever install */
+    reloaded = true;
+    location.reload();
+  });
   window.addEventListener("load", function(){
     navigator.serviceWorker.register("./sw.js").then(function(reg){
       if (navigator.serviceWorker.controller) say(SAVED, true);

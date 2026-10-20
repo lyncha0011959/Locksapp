@@ -803,7 +803,9 @@ function gateSVG(open) {
          '<path class="cautionBang" d="M318 22 V31"/>' +
          '<circle class="cautionDot" cx="318" cy="35.5" r="1.8"/>';
   } else {
-    s += lane(306, false, 48, 252) + lane(330, true, 48, 252);
+    /* Boats pass port to port, so each keeps to its own starboard side:
+       northbound hugs the east wall (right on the page), southbound the west. */
+    s += lane(330, false, 48, 252) + lane(306, true, 48, 252);
   }
 
   /* labels and compass */
