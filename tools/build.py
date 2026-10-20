@@ -12,12 +12,17 @@ Run:  python3 build.py
 """
 import base64
 import pathlib
+import re
 
 ROOT = pathlib.Path(__file__).resolve().parent
 OUT = ROOT.parent
-VERSION = "v17.2"
+VERSION = "v15"
 
 # ---- sponsor -----------------------------------------------------------------
+# Set SPONSOR_ENABLED = True to bring back the opening card and the credit line
+# above About. Everything else (logo file, styles, markup) stays in place.
+SPONSOR_ENABLED = False
+
 # To change sponsor: drop a new logo at gateclock/sponsor/logo.png (transparent
 # PNG, brand colour, ~440px wide) and edit the two lines below. Nothing else.
 SPONSOR_NAME = "Hampton Jitney"
@@ -38,11 +43,13 @@ for token in ("__T0__", "__ENC__", "__SPONSOR_LOGO__", "__SPONSOR_NAME__", "__SP
     assert token not in src, "unreplaced placeholder: " + token
 
 # ---- 2. split head / body ----------------------------------------------------
-MARK = '</style>\n\n<div class="splash"'
-assert MARK in src, "split marker not found"
+if not SPONSOR_ENABLED:
+    src = re.sub(r"[ \t]*<!--SPONSOR-->.*?<!--/SPONSOR-->\n?", "", src, flags=re.S)
+    
+MARK = "</style>\n\n"
 head, rest = src.split(MARK, 1)
 head += "</style>"
-body = '<div class="splash"' + rest
+body = rest
 
 head = head.replace('"Archivo",sans-serif',
                     '"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif')
@@ -107,15 +114,14 @@ else:
                  "     cf_token.txt and rebuild, and the beacon tag lands here. -->")
 
 SHELL = """<!doctype html>
-<!-- (c) 2026 Andrew Lynch. All rights reserved. No permission is granted to reproduce, modify, distribute or use this source code without prior written permission. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Is the Shinnecock Canal lock open or closed? Live gate status, next change, and passage routing for the Shinnecock Locks.">
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#F2F5F6" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#0B1419" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#E6ECEE" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#07131A" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="./icons/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
