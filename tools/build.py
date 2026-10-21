@@ -14,15 +14,14 @@ import base64
 import pathlib
 import re
 
-ROOT = pathlib.Path(__file__).resolve().parent
-OUT = ROOT.parent
-VERSION = "v17"
+ROOT = pathlib.Path("/home/claude")
+OUT = ROOT / "gateclock"
+VERSION = "v20"
 
-# ---- sponsor -----------------------------------------------------------------
-# Set SPONSOR_ENABLED = True to bring back the opening card and the credit line
-# above About. Everything else (logo file, styles, markup) stays in place.
+# Set SPONSOR_ENABLED = True to bring the opening card and credit line back.
 SPONSOR_ENABLED = False
 
+# ---- sponsor -----------------------------------------------------------------
 # To change sponsor: drop a new logo at gateclock/sponsor/logo.png (transparent
 # PNG, brand colour, ~440px wide) and edit the two lines below. Nothing else.
 SPONSOR_NAME = "Hampton Jitney"
@@ -41,11 +40,13 @@ src = (src.replace("__T0__", t0.strip())
           .replace("__SPONSOR_URL__", SPONSOR_URL))
 for token in ("__T0__", "__ENC__", "__SPONSOR_LOGO__", "__SPONSOR_NAME__", "__SPONSOR_URL__"):
     assert token not in src, "unreplaced placeholder: " + token
+(ROOT / "shinnecock.html").write_text(src)
 
 # ---- 2. split head / body ----------------------------------------------------
 if not SPONSOR_ENABLED:
     src = re.sub(r"[ \t]*<!--SPONSOR-->.*?<!--/SPONSOR-->\n?", "", src, flags=re.S)
-    
+    (ROOT / "shinnecock.html").write_text(src)
+
 MARK = "</style>\n\n"
 head, rest = src.split(MARK, 1)
 head += "</style>"
@@ -87,8 +88,8 @@ SW_JS = """
   var SAVED = "App shell saved to this device";
   if (!("serviceWorker" in navigator)) { say("This browser can't store the app shell.", false); return; }
   say(navigator.serviceWorker.controller ? SAVED : "Saving app shell\\u2026", !!navigator.serviceWorker.controller);
-  /* When a newer worker takes over an already-running app, reload once so the
-     user sees the new version immediately instead of on their next launch. */
+  /* When a newer worker takes over a running app, reload once so the user sees
+     the new version now rather than on their next launch. */
   var hadController = !!navigator.serviceWorker.controller, reloaded = false;
   navigator.serviceWorker.addEventListener("controllerchange", function () {
     if (!hadController || reloaded) return;   /* never on a first-ever install */
@@ -122,14 +123,15 @@ else:
                  "     cf_token.txt and rebuild, and the beacon tag lands here. -->")
 
 SHELL = """<!doctype html>
+<!-- (c) 2026 Andrew Lynch. All rights reserved. No permission is granted to reproduce, modify, distribute or use this source code without prior written permission. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Is the Shinnecock Canal lock open or closed? Live gate status, next change, and passage routing for the Shinnecock Locks.">
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#E6ECEE" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#07131A" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F5F6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B1419" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="./icons/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">

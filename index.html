@@ -1,12 +1,13 @@
 <!doctype html>
+<!-- (c) 2026 Andrew Lynch. All rights reserved. No permission is granted to reproduce, modify, distribute or use this source code without prior written permission. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="description" content="Is the Shinnecock Canal lock open or closed? Live gate status, next change, and passage routing for the Shinnecock Locks.">
 <link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#E6ECEE" media="(prefers-color-scheme: light)">
-<meta name="theme-color" content="#07131A" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#F2F5F6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0B1419" media="(prefers-color-scheme: dark)">
 <link rel="icon" href="./icons/favicon-32.png" sizes="32x32">
 <link rel="apple-touch-icon" href="./icons/icon-192.png">
 <meta name="mobile-web-app-capable" content="yes">
@@ -18,86 +19,86 @@
 <link id="webfonts" rel="stylesheet" media="print" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=Public+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
 <style>
 :root{
-  --paper:#E6ECEE;
-  --card:#F4F7F8;
-  --sunk:#DAE3E6;
-  --ink:#0C1D25;
-  --ink-2:#3D5560;
-  --ink-3:#6B838D;
-  --rule:#C2D0D5;
-  --rule-2:#AEC0C6;
-  --run:#C4162A;
-  --run-ink:#A00E1F;
-  --run-wash:#FBDCDE;
-  --lock:#0B6E4B;
-  --lock-ink:#0A5C3F;
-  --lock-wash:#D6EBE1;
-  --accent:#2C6079;
-  --focus:#2C6079;
-  --land:#C7D3D6;
-  --water:#9FBED0;
-  --water-far:#B9D0DB;
-  --sky:#CBDEE9;
-  --steel:#8FA3AC;
-  --teal:#129C99;
-  --route:#15629E;
-  --glass:#DDEFF1;
-  --shadow:0 1px 2px rgba(12,29,37,.08), 0 6px 18px -10px rgba(12,29,37,.28);
+  --paper:#F2F5F6;
+  --card:#FFFFFF;
+  --sunk:#E6ECEE;
+  --ink:#08161C;
+  --ink-2:#26404B;
+  --ink-3:#4A626C;
+  --rule:#C3D0D5;
+  --rule-2:#97ABB3;
+  --run:#C0102A;
+  --run-ink:#9A0A1D;
+  --run-wash:#FDE2E5;
+  --lock:#06714C;
+  --lock-ink:#055A3C;
+  --lock-wash:#DAF0E5;
+  --accent:#1B5672;
+  --focus:#1B5672;
+  --land:#D9D3C4;
+  --water:#86B6D2;
+  --water-far:#ADCDE0;
+  --sky:#D3E4EE;
+  --steel:#556973;
+  --teal:#0E8683;
+  --route:#0B4A84;
+  --glass:#E6F5F7;
+  --shadow:0 1px 2px rgba(8,22,28,.08), 0 6px 18px -10px rgba(8,22,28,.28);
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
-    --paper:#07131A;
-    --card:#0E212B;
-    --sunk:#0A1A22;
-    --ink:#E4EEF2;
-    --ink-2:#A2B7C0;
-    --ink-3:#71888F;
-    --rule:#1D3844;
-    --rule-2:#2A4C5B;
-    --run:#FF5146;
-    --run-ink:#FF8A80;
-    --run-wash:#2C0C0A;
-    --lock:#3DD69A;
-    --lock-ink:#6FE5B6;
-    --lock-wash:#06251A;
-    --accent:#7FC2DE;
-    --focus:#7FC2DE;
-    --land:#16303C;
-    --water:#0D2836;
-    --water-far:#123243;
-    --sky:#0A2231;
-    --steel:#3C5867;
-    --teal:#12807E;
-  --route:#63B8E8;
-  --glass:#1C5E5C;
-    --route:#63B8E8;
-    --glass:#1C5E5C;
+    --paper:#0B1419;
+    --card:#15232B;
+    --sunk:#0F1C23;
+    --ink:#F2F7F9;
+    --ink-2:#C6D4DA;
+    --ink-3:#98ADB6;
+    --rule:#2B414C;
+    --rule-2:#416070;
+    --run:#FF645B;
+    --run-ink:#FF9E96;
+    --run-wash:#3A1513;
+    --lock:#47DDA2;
+    --lock-ink:#82ECC3;
+    --lock-wash:#0D3024;
+    --accent:#92CFEA;
+    --focus:#92CFEA;
+    --land:#495356;
+    --water:#163F58;
+    --water-far:#1D4B66;
+    --sky:#0F2837;
+    --steel:#8DA2AD;
+    --teal:#1FA29E;
+    --route:#86CEF5;
+    --glass:#2E807C;
     --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -12px rgba(0,0,0,.8);
   }
 }
 :root[data-theme="dark"]{
-  --paper:#07131A;
-  --card:#0E212B;
-  --sunk:#0A1A22;
-  --ink:#E4EEF2;
-  --ink-2:#A2B7C0;
-  --ink-3:#71888F;
-  --rule:#1D3844;
-  --rule-2:#2A4C5B;
-  --run:#FF5146;
-  --run-ink:#FF8A80;
-  --run-wash:#2C0C0A;
-  --lock:#3DD69A;
-  --lock-ink:#6FE5B6;
-  --lock-wash:#06251A;
-  --accent:#7FC2DE;
-  --focus:#7FC2DE;
-  --land:#16303C;
-  --water:#0D2836;
-  --water-far:#123243;
-  --sky:#0A2231;
-  --steel:#3C5867;
-  --teal:#12807E;
+  --paper:#0B1419;
+  --card:#15232B;
+  --sunk:#0F1C23;
+  --ink:#F2F7F9;
+  --ink-2:#C6D4DA;
+  --ink-3:#98ADB6;
+  --rule:#2B414C;
+  --rule-2:#416070;
+  --run:#FF645B;
+  --run-ink:#FF9E96;
+  --run-wash:#3A1513;
+  --lock:#47DDA2;
+  --lock-ink:#82ECC3;
+  --lock-wash:#0D3024;
+  --accent:#92CFEA;
+  --focus:#92CFEA;
+  --land:#495356;
+  --water:#163F58;
+  --water-far:#1D4B66;
+  --sky:#0F2837;
+  --steel:#8DA2AD;
+  --teal:#1FA29E;
+  --route:#86CEF5;
+  --glass:#2E807C;
   --shadow:0 1px 2px rgba(0,0,0,.5), 0 8px 22px -12px rgba(0,0,0,.8);
 }
 
@@ -136,23 +137,29 @@ body{
 .hero .band{height:7px;background:var(--st)}
 .hero .body{padding:18px 18px 19px;display:flex;flex-direction:column;gap:13px}
 
-/* the two headline lines are the same size — colour and case carry the hierarchy */
-.hero .headline{display:flex;flex-direction:column;gap:2px}
+/* One headline. The state is the answer; the clock line is the only thing that
+   gets to follow it. Everything else in the hero is a detail and reads smaller. */
+.hero .headline{display:flex;flex-direction:column;gap:7px}
 .hero .state{
-  font-family:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:700;
-  font-size:clamp(30px,8.8vw,42px);line-height:1.02;letter-spacing:-.005em;
+  font-family:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:800;
+  font-size:clamp(38px,11.2vw,54px);line-height:.98;letter-spacing:-.025em;
   text-transform:uppercase;color:var(--st);
 }
-.hero h2{
-  font-family:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:800;
-  font-size:clamp(30px,8.8vw,42px);
-  line-height:1.02;letter-spacing:-.03em;margin:0;color:var(--st);text-wrap:balance;
+.hero .clock{
+  margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:0 9px;
+  font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-variant-numeric:tabular-nums;line-height:1.15;
 }
+.hero .clock .verb{
+  font-size:12px;font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);
+  flex-basis:100%;
+}
+.hero .clock .num{font-size:clamp(26px,7.6vw,34px);font-weight:600;color:var(--ink);letter-spacing:-.02em}
+.hero .clock .dur{font-size:clamp(15px,4.2vw,18px);font-weight:500;color:var(--ink-2)}
 .hero .mode{
   align-self:flex-start;
-  font-family:"IBM Plex Mono",monospace;font-size:11.5px;letter-spacing:.09em;
-  text-transform:uppercase;color:var(--ink-2);
-  background:var(--sunk);border:1px solid var(--rule);border-radius:2px;padding:4px 8px;
+  font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-3);
 }
 .hero p{margin:0;color:var(--ink-2);font-size:14px;line-height:1.45;max-width:46ch}
 .hero .dirs{display:flex;flex-direction:column;gap:5px}
@@ -187,7 +194,7 @@ body{
 .gate .seam{stroke:var(--card);stroke-width:2;opacity:.55}
 .gate .rail{stroke:var(--steel);stroke-width:3;fill:none}
 .gate .chain{stroke:var(--steel);stroke-width:2;opacity:.8;fill:none}
-.gate .rush{stroke:var(--st);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.gate .rush{stroke:var(--st);stroke-width:5;stroke-linecap:round;stroke-linejoin:round;fill:none}
 .gate .ripple{stroke:var(--ink-3);stroke-width:2.5;stroke-linecap:round;fill:none;opacity:.4}
 .gate text{
   font-family:"IBM Plex Mono",monospace;font-size:13px;font-weight:500;
@@ -211,17 +218,17 @@ body{
 .cur .txt{display:flex;flex-direction:column;gap:2px;min-width:0}
 .cur .txt b{font-size:15px;font-weight:600;color:var(--curcol);line-height:1.2}
 .cur .txt span{font-size:12.5px;color:var(--ink-2);line-height:1.35}
-.clockrow{
-  display:flex;align-items:flex-end;justify-content:space-between;gap:14px;
-  margin-top:2px;padding-top:15px;border-top:1px dashed var(--rule-2);
-}
-.clockrow .lab{color:var(--ink-3);display:block;margin-bottom:4px}
-.clockrow .big{
-  font-family:"IBM Plex Mono",monospace;font-weight:600;font-size:36px;
-  letter-spacing:-.03em;line-height:1;color:var(--ink);font-variant-numeric:tabular-nums;
-}
-.clockrow .at{text-align:right}
-.clockrow .at .big{font-size:28px;color:var(--st)}
+/* v17.2: bigger glance text in the hero. Direction lines lead; label sits
+   above its line so the line gets the full card width. */
+.hero p{font-size:15px;line-height:1.4}
+.hero .dirs{gap:11px}
+.hero .dir{flex-direction:column;align-items:flex-start;gap:1px}
+.hero .dir b{font-size:12.5px;font-weight:600;letter-spacing:.1em;color:var(--ink-2);min-width:0}
+.hero .dir span{font-size:19px;font-weight:600;line-height:1.3;color:var(--ink)}
+.cur{padding:12px 13px}
+.cur .meter i{width:18px;height:18px}
+.cur .txt b{font-size:18px}
+.cur .txt span{font-size:15.5px;line-height:1.35}
 
 .flag{
   display:inline-flex;align-items:center;gap:7px;padding:9px 11px;border-radius:2px;
@@ -240,72 +247,54 @@ body{
   padding:15px 15px 11px;display:flex;flex-direction:column;gap:9px;box-shadow:var(--shadow);
 }
 .stripnav{display:flex;align-items:center;justify-content:space-between;gap:10px}
-.stripnav .day{font-family:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:600;font-size:17px;letter-spacing:-.01em}
-.stripnav .btns{display:flex;gap:6px}
+.stripnav .day{
+  font-weight:600;font-size:17px;letter-spacing:-.01em;
+  flex:1;text-align:center;font-variant-numeric:tabular-nums;
+}
 button{font:inherit;cursor:pointer}
 .nav{
-  width:40px;height:34px;display:grid;place-items:center;padding:0;
-  background:var(--sunk);color:var(--ink-2);border:1px solid var(--rule);border-radius:2px;
-  font-size:14px;line-height:1;
+  width:44px;height:36px;display:grid;place-items:center;padding:0;flex:none;
+  background:transparent;color:var(--ink-3);border:none;border-radius:8px;
+  font-size:13px;line-height:1;
 }
-.nav:hover{border-color:var(--rule-2);color:var(--ink)}
+.nav:hover{background:var(--sunk);color:var(--ink)}
 .nav:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
 
-.track{position:relative;height:46px;border-radius:2px;overflow:hidden;background:var(--sunk)}
+/* The track IS the time control. Drag it and the hero follows — which is why
+   there is no date field, no Check button and no list of next changes. */
+.track{
+  position:relative;height:58px;border-radius:10px;overflow:hidden;background:var(--sunk);
+  touch-action:none;cursor:ew-resize;user-select:none;-webkit-user-select:none;
+}
+.track:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.segs{position:absolute;inset:0}
 .seg{position:absolute;top:0;bottom:0}
 .seg.open{background:var(--run)}
 .seg.closed{background:var(--lock)}
-.hw{position:absolute;top:0;bottom:0;width:1px;background:var(--paper);opacity:.85}
-.nowline{position:absolute;top:-4px;bottom:-4px;width:2px;background:var(--ink);box-shadow:0 0 0 1.5px var(--card)}
-.nowline::after{
-  content:"";position:absolute;left:50%;top:-3px;transform:translateX(-50%);
-  border-left:4px solid transparent;border-right:4px solid transparent;border-top:5px solid var(--ink);
+.hw{position:absolute;top:0;bottom:0;width:1px;background:var(--paper);opacity:.5}
+.nowline{position:absolute;top:0;bottom:0;width:2px;background:var(--ink);opacity:.55}
+.scrub{position:absolute;top:0;bottom:0;width:3px;background:var(--ink);box-shadow:0 0 0 1.5px var(--card)}
+.scrub b{
+  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  width:26px;height:26px;border-radius:50%;background:var(--card);
+  box-shadow:0 1px 4px rgba(0,0,0,.35);border:2px solid var(--ink);
 }
 .axis{position:relative;height:17px}
 .axis span{
   position:absolute;top:0;transform:translateX(-50%);
   font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3);white-space:nowrap;
 }
-.hwrow{display:flex;flex-wrap:wrap;gap:5px 16px;padding-top:2px}
-.hwrow span{font-family:"IBM Plex Mono",monospace;font-size:12.5px;color:var(--ink-3)}
-.hwrow b{color:var(--ink-2);font-weight:500}
-.key{display:flex;gap:16px;flex-wrap:wrap;padding-top:7px;border-top:1px solid var(--rule)}
-.key i{display:flex;align-items:center;gap:7px;font-style:normal;font-size:13px;color:var(--ink-2)}
-.key i::before{content:"";width:13px;height:13px;border-radius:2px;background:var(--k);flex:none}
-
-/* ---------- transitions ---------- */
-.tl{display:flex;flex-direction:column;border:1px solid var(--rule);border-radius:3px;overflow:hidden;background:var(--card)}
-.tl .row{
-  display:grid;grid-template-columns:8px 1fr auto;align-items:center;gap:12px;
-  padding:13px 14px 13px 12px;border-top:1px solid var(--rule);
+.striprow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:8px;border-top:1px solid var(--rule)}
+.key{display:flex;gap:14px;flex-wrap:wrap}
+.key i{display:flex;align-items:center;gap:6px;font-style:normal;font-size:12.5px;color:var(--ink-2)}
+.key i::before{content:"";width:11px;height:11px;border-radius:3px;background:var(--k);flex:none}
+.now{
+  flex:none;padding:7px 15px;border-radius:999px;font-size:13.5px;font-weight:600;
+  background:var(--accent);color:var(--paper);border:none;
 }
-.tl .row:first-child{border-top:none}
-.tl .row .pip{width:9px;height:9px;border-radius:50%;background:var(--st)}
-.tl .row .what{display:flex;flex-direction:column;gap:2px;min-width:0}
-.tl .row .what b{font-weight:600;font-size:17px;color:var(--st);line-height:1.2}
-.tl .row .what span{font-size:12.5px;color:var(--ink-3)}
-.tl .row .when{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:17px;color:var(--ink);white-space:nowrap;font-variant-numeric:tabular-nums;line-height:1.2}
-.tl .row .when small{display:block;font-size:11px;color:var(--ink-3);letter-spacing:.01em}
-
-/* ---------- lookup ---------- */
-.lookup{
-  background:var(--card);border:1px solid var(--rule);border-radius:3px;
-  padding:15px;display:flex;flex-direction:column;gap:11px;
-}
-.lookup .ctl{display:flex;gap:8px;flex-wrap:wrap}
-input[type="datetime-local"]{
-  flex:1 1 210px;min-width:0;font:inherit;font-family:"IBM Plex Mono",monospace;font-size:15.5px;
-  padding:11px 11px;background:var(--paper);color:var(--ink);
-  border:1px solid var(--rule-2);border-radius:2px;
-}
-input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outline-offset:0;border-color:var(--focus)}
-.btn{
-  padding:11px 17px;background:var(--accent);color:var(--paper);border:1px solid var(--accent);
-  border-radius:2px;font-size:15.5px;font-weight:600;
-}
-.btn.ghost{background:transparent;color:var(--ink-2);border-color:var(--rule-2)}
-.btn:hover{filter:brightness(1.08)}
-.btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.now:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.hint{margin:0;font-size:12px;line-height:1.4;color:var(--ink-3)}
+.hint b{color:var(--ink-2);font-weight:500}
 
 /* ---------- notes ---------- */
 .notes{
@@ -351,6 +340,7 @@ input[type="datetime-local"]:focus-visible{outline:2px solid var(--focus);outlin
 @media (prefers-reduced-motion:reduce){.about .chev{transition:none}}
 .notes .warn{color:var(--run-ink);font-weight:500}
 .notes a{color:var(--accent)}
+.notes .copy{font-size:12px;color:var(--ink-3);line-height:1.5;padding-top:10px;border-top:1px solid var(--rule)}
 
 /* ---------- sponsor: opening card and persistent credit ---------- */
 .splash{
@@ -454,65 +444,45 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
       <span class="mode" id="heroMode" hidden>Live</span>
       <div class="headline">
         <span class="state" id="heroEyebrow">&mdash;</span>
-        <h2 id="heroTitle">&mdash;</h2>
+        <p class="clock" id="heroClock">
+          <span class="verb" id="clockLab">&mdash;</span>
+          <span class="num" id="atBig">&mdash;</span>
+          <span class="dur" id="clockBig"></span>
+        </p>
       </div>
       <div id="heroGate"></div>
-      <p id="heroDesc"></p>
-      <div class="dirs" id="heroDirs"></div>
       <div id="heroCurrent"></div>
-      <div class="clockrow">
-        <div>
-          <span class="eyebrow lab" id="clockLab">Changes in</span>
-          <span class="big" id="clockBig">&mdash;</span>
-        </div>
-        <div class="at">
-          <span class="eyebrow lab" id="atLab">At</span>
-          <span class="big" id="atBig">&mdash;</span>
-        </div>
-      </div>
+      <div class="dirs" id="heroDirs"></div>
       <div id="heroFlag"></div>
     </div>
   </section>
 
+
   <section class="sec">
-    <span class="eyebrow">Day view</span>
     <div class="strip">
       <div class="stripnav">
+        <button class="nav" id="dayPrev" aria-label="Previous day">&#9664;</button>
         <span class="day" id="stripDay">&mdash;</span>
-        <span class="btns">
-          <button class="nav" id="dayPrev" aria-label="Previous day">◀</button>
-          <button class="nav" id="dayNext" aria-label="Next day">▶</button>
-        </span>
+        <button class="nav" id="dayNext" aria-label="Next day">&#9654;</button>
       </div>
-      <div class="track" id="track"></div>
+      <div class="track" id="track" tabindex="0" role="slider"
+           aria-label="Drag to read the gates at any time of day"
+           aria-valuemin="0" aria-valuemax="1439" aria-valuenow="0" aria-valuetext="now">
+        <div class="segs" id="segs"></div>
+        <div class="nowline" id="nowline" hidden></div>
+        <div class="scrub" id="scrub" hidden><b></b></div>
+      </div>
       <div class="axis" id="axis"></div>
-      <div class="hwrow" id="hwrow"></div>
-      <div class="key">
-        <i style="--k:var(--run)">Gates open &mdash; current running</i>
-        <i style="--k:var(--lock)">Gates closed &mdash; lock passage</i>
+      <div class="striprow">
+        <span class="key">
+          <i style="--k:var(--run)">Open &mdash; current running</i>
+          <i style="--k:var(--lock)">Closed &mdash; lock passage</i>
+        </span>
+        <button class="now" id="nowBtn" hidden>Now</button>
       </div>
+      <p class="hint" id="stripHint">Drag the bar to read any time. Predictions through <b id="coverEnd">&mdash;</b>.</p>
     </div>
   </section>
-
-  <section class="sec">
-    <span class="eyebrow">Next changes</span>
-    <div class="tl" id="timeline"></div>
-  </section>
-
-  <section class="sec">
-    <span class="eyebrow">Check another time</span>
-    <div class="lookup">
-      <div class="ctl">
-        <input type="datetime-local" id="pick" aria-label="Date and time to check">
-        <button class="btn" id="go">Check</button>
-        <button class="btn ghost" id="live">Back to now</button>
-      </div>
-      <p style="margin:0;font-size:13px;color:var(--ink-3)">
-        All times EST/EDT. Predictions run through <b id="coverEnd">&mdash;</b>.
-      </p>
-    </div>
-  </section>
-
 
   <p class="warnline">Prediction only &mdash; not for navigation. Confirm on scene or on VHF&nbsp;13.</p>
 
@@ -536,7 +506,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     <h3>Notes to mariners</h3>
     <dl>
       <dt>Passage</dt>
-      <dd>Four openings: three tidal gates and the powered lock against the east wall. With the gates shut, everything locks through on the east. With them open the lock stands open too, so the only passage is southbound, through the <b>middle tidal gate</b> between the flared guidewalls. There is no protected way north until the gates shut.</dd>
+      <dd>Four openings: three tidal gates and the powered lock against the east wall. With the gates shut, everything locks through on the east. With them open, both directions still have a way through, but they are not the same way. <b>Southbound</b> uses the <b>middle tidal gate</b>, between the flared guidewalls, running with the current. <b>Northbound</b> uses the <b>lock on the east side</b>, which stands open &mdash; so you transit it rather than lock through, and you do it against the full set. Nothing is sheltered until the gates shut.</dd>
       <dt>Timing</dt>
       <dd>Gate state is predicted from published NOAA tide data using a fixed offset to local high water. A closed window of six hours alternates with roughly six and a half hours open.</dd>
       <dt>On scene</dt>
@@ -544,10 +514,11 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
     </dl>
     <p class="warn">This is a prediction, not an observation. Wind and storm surge shift real tides by an hour or more, and mechanical failure or county maintenance overrides the schedule entirely &mdash; the canal has closed to all traffic on short notice before.</p>
     <p>Not for navigation. Confirm on scene or by radio before committing to the cut. Predictions have not been verified against logged gate operations; treat the timing as approximate and widen your margin near a transition.</p>
+    <p class="copy">&copy; 2026 Andrew Lynch. All rights reserved. No permission is granted to reproduce, modify, distribute or use this application or its source code without prior written permission. Tide predictions are NOAA public data; the sponsor&rsquo;s name and logo belong to the sponsor.</p>
   </section>
 
   <footer class="foot">
-    <span>Shinnecock Locks &middot; Locks Open? v17</span>
+    <span>Shinnecock Locks &middot; Locks Open? v20</span>
     <span id="swstate">Checking device storage&hellip;</span>
   </footer>
 
@@ -720,8 +691,9 @@ var $ = function(id){ return document.getElementById(id); };
 function gateSVG(open) {
   /* west to east: three tidal gates, then the powered lock against the east wall.
      Southbound with the current runs the middle tidal gate, the one with the
-     flared guidewalls. When the gates are open the lock stands open too, so
-     there is no sheltered way north — that is the whole point of the warning. */
+     flared guidewalls. Northbound uses the lock on the east side either way:
+     with the gates shut you lock through it, with them open it stands open and
+     you transit it against the set. Nothing is sheltered while they are open. */
   var BAYS = [
     { x0: 72,  x1: 124, kind: "tidal" },
     { x0: 142, x1: 204, kind: "middle" },
@@ -731,13 +703,13 @@ function gateSVG(open) {
   var BAND0 = 118, BAND1 = 168, WL = 356;
 
   var s = '<svg class="gate" viewBox="0 0 440 280" role="img" aria-label="' +
-          (open ? "Overhead view, north up. Gates open: the current runs south through all four openings and the lock stands open. Southbound uses the middle tidal gate; there is no protected passage north."
+          (open ? "Overhead view, north up. Gates open: the current runs south through all four openings and the lock stands open. Southbound uses the middle tidal gate with the current; northbound uses the open lock on the east side, against the current."
                 : "Overhead view, north up. Gates shut: all traffic locks through on the east side.") + '">';
 
   s += '<defs>';
   for (var d = 0; d < BAYS.length; d++)
     s += '<clipPath id="bay' + d + '"><rect x="' + BAYS[d].x0 + '" y="40" width="' +
-         (BAYS[d].x1 - BAYS[d].x0) + '" height="186"/></clipPath>';
+         (BAYS[d].x1 - BAYS[d].x0) + '" height="240"/></clipPath>';
   s += '</defs>';
 
   /* canal and banks */
@@ -748,10 +720,14 @@ function gateSVG(open) {
   /* with the gates open every opening flushes, the lock included */
   if (open) {
     for (var i = 0; i < BAYS.length; i++) {
-      var b = BAYS[i], cx = (b.x0 + b.x1) / 2, hw = (b.x1 - b.x0) / 2 - 5;
+      var b = BAYS[i], cx = (b.x0 + b.x1) / 2, half = (b.x1 - b.x0) / 2;
+      /* 15% smaller than before, then narrowed further if needed so the stroke
+         clears the open leaves (lock gates on the lock bay) by 2 px each side */
+      var inner = half - (b.kind === "lock" ? 9 : 8);
+      var hw = Math.min(0.85 * (half - 5), inner - 2.5 - 2);
       s += '<g clip-path="url(#bay' + i + ')"><g class="rushWrap">';
       for (var y = 30; y <= 250; y += 46)
-        s += '<path class="rush" d="M' + (cx - hw) + ' ' + y + ' L' + cx + ' ' + (y + 13) +
+        s += '<path class="rush" d="M' + (cx - hw) + ' ' + y + ' L' + cx + ' ' + (y + 11) +
              ' L' + (cx + hw) + ' ' + y + '"/>';
       s += '</g></g>';
     }
@@ -764,8 +740,8 @@ function gateSVG(open) {
          (edges[e][1] - edges[e][0]) + '" height="' + (BAND1 - BAND0) + '"/>';
 
   /* flared guidewalls funnelling into the middle tidal gate from the north */
-  s += '<path class="guide" d="M142 ' + BAND0 + ' L112 72"/>' +
-       '<path class="guide" d="M204 ' + BAND0 + ' L234 72"/>';
+  s += '<path class="guide" d="M142 ' + BAND0 + ' L122 72"/>' +
+       '<path class="guide" d="M204 ' + BAND0 + ' L224 72"/>';
 
   /* the gates themselves */
   for (var g = 0; g < BAYS.length; g++) {
@@ -792,11 +768,6 @@ function gateSVG(open) {
          '<rect class="lockgate" x="293" y="156" width="51" height="10"/>';
   }
 
-  /* highway bridge, south of the locks */
-  s += '<rect class="steel" x="0" y="226" width="440" height="13"/>' +
-       '<rect class="conc" x="148" y="222" width="13" height="21"/>' +
-       '<rect class="conc" x="248" y="222" width="13" height="21"/>';
-
   /* operator's house: raised glazed cab on the east wall, overlooking the lock */
   s += '<rect class="steel" x="' + (WL + 2) + '" y="88" width="80" height="11"/>' +
        '<rect class="teal"  x="' + (WL + 8) + '" y="99" width="68" height="74"/>' +
@@ -816,8 +787,8 @@ function gateSVG(open) {
   }
   if (open) {
     s += lane(173, true, 44, 252);                       /* southbound rides the middle gate */
-    /* northbound still goes by the lock, but with nothing to lock into and the
-       set on the nose — dashed, and flagged, rather than a clean lane */
+    /* northbound goes through the lock as always, but it stands open, so this is
+       a transit against the full set rather than a locking — hence the flag */
     s += '<path class="routeCase" d="M318 60 V252"/>' +
          '<path class="route"     d="M318 60 V252"/>' +
          '<path class="routeHead" d="M318 45 L309 63 L327 63 Z"/>';
@@ -825,7 +796,7 @@ function gateSVG(open) {
          '<path class="cautionBang" d="M318 22 V31"/>' +
          '<circle class="cautionDot" cx="318" cy="35.5" r="1.8"/>';
   } else {
-    /* Boats pass port to port, so each keeps to its own starboard side:
+    /* Boats pass port to port, so each keeps its own starboard side:
        northbound hugs the east wall (right on the page), southbound the west. */
     s += lane(330, false, 48, 252) + lane(306, true, 48, 252);
   }
@@ -870,7 +841,7 @@ var BAND_NAME = ["Light", "Moderate", "Strong"];
 function easesAt(st) {
   if (!st || st.out || !st.open) return null;
   var L = st.until - st.since, step = L / 120, t, s;
-  for (t = Date.now() + step; t < st.until; t += step) {
+  for (t = Math.max(active(), st.since) + step; t < st.until; t += step) {
     s = strengthAt(t, st);
     if (s && band(s.rel) === 0) return t;
   }
@@ -886,37 +857,29 @@ function renderHero() {
   if (st.out) {
     hero.style.setProperty("--st", "var(--ink-3)");
     $("heroEyebrow").textContent = "No prediction";
-    $("heroTitle").textContent = "Out of range";
-    $("heroDesc").textContent = "This app carries tide predictions from Sep 1 2026 through Dec 31 2028. Pick a time inside that window.";
+    $("clockLab").textContent = "Out of range";
+    $("atBig").textContent = "—"; $("clockBig").textContent = "";
     $("heroGate").innerHTML = ""; lastGate = null;
     $("heroCurrent").innerHTML = "";
     $("heroDirs").innerHTML = "";
-    $("clockLab").textContent = "—"; $("clockBig").textContent = "—";
-    $("atLab").textContent = "—"; $("atBig").textContent = "—";
     $("heroFlag").innerHTML = "";
     return;
   }
 
   hero.style.setProperty("--st", st.open ? "var(--run)" : "var(--lock)");
   $("heroEyebrow").textContent = st.open ? "Gates open" : "Gates closed";
-  $("heroTitle").textContent = st.open ? "Current running" : "Lock passage";
   /* Only redraw when the state actually flips. Rewriting the SVG on every
      30-second tick restarted the water animation from zero each time. */
   if (lastGate !== st.open) { $("heroGate").innerHTML = gateSVG(st.open); lastGate = st.open; }
   var sNow = strengthAt(ms, st), bNow = sNow ? band(sNow.rel) : -1;
-  $("heroDesc").textContent = !st.open
-    ? "The gates are shut. Traffic passes through the lock chamber."
-    : bNow === 2 ? "Water is running north to south through the gate openings at or near its peak \u2014 call it 6 knots."
-    : bNow === 1 ? (sNow.f < 0.45
-        ? "Water is running north to south through the gate openings and still building."
-        : "Water is still running north to south through the gate openings, but easing.")
-    : "The gates are open, but the head driving the flush has nearly gone. The set is light for now.";
 
   $("heroDirs").innerHTML = st.open
-    ? '<div class="dir"><b>Northbound</b><span>No sheltered passage &mdash; the lock stands open too. Wait for the gates to shut, or take the full set on the nose.</span></div>' +
-      '<div class="dir"><b>Southbound</b><span>Middle tidal gate, between the flared guidewalls. ' +
-      (bNow === 0 ? 'Easy water, but once you are in you are committed.'
-                  : 'With the current, fast and committed.') + '</span></div>'
+    ? '<div class="dir"><b>Northbound</b><span>Open lock, east side &mdash; against ' +
+      (bNow === 2 ? 'heavy current, which can make passage dangerous.'
+                  : (bNow === 1 ? 'a moderate set. Judge it before you commit.'
+                                : 'the current, light for now.')) +
+      '</span></div>' +
+      '<div class="dir"><b>Southbound</b><span>Middle gate, with the current.</span></div>'
     : '<div class="dir"><b>Both ways</b><span>Lock through on the east side. One chamber, so expect to wait out opposing traffic.</span></div>';
 
   var cur = $("heroCurrent");
@@ -925,10 +888,10 @@ function renderHero() {
     var col = ["var(--lock)", "#C98A00", "var(--run)"][bi];
     var ease = easesAt(st), lite = "";
     if (bi === 0) lite = sN.f < 0.5
-      ? "Easiest water of this window \u2014 it builds quickly from here."
-      : "Easiest water of this window \u2014 holds until the gates shut.";
-    else if (ease) lite = "Eases off around " + hhmm(ease) + ".";
-    else lite = "Stays up until the gates shut.";
+      ? "Builds quickly from here."
+      : "Stays light until the gates shut.";
+    else if (ease) lite = "Eases around " + hhmm(ease) + ".";
+    else lite = "Until the gates shut.";
     cur.innerHTML = '<div class="cur" style="--curcol:' + col + '">' +
       '<span class="meter">' +
         '<i class="on"></i>' + (bi > 0 ? '<i class="on"></i>' : '<i></i>') +
@@ -937,10 +900,11 @@ function renderHero() {
       '<span class="txt"><b>' + BAND_NAME[bi] + ' current</b><span>' + lite + '</span></span></div>';
   } else { cur.innerHTML = ""; }
 
-  $("clockLab").textContent = st.open ? "Gates close in" : "Gates open in";
-  $("clockBig").textContent = dur(st.until - ms);
-  $("atLab").textContent = "At";
+  /* One instrument line: what happens, when, and how long you have. */
+  $("clockLab").textContent = st.open ? "Gates close" : "Gates open";
   $("atBig").textContent = hhmm(st.until);
+  $("clockBig").textContent = (pinned === null ? "in " : "· ") + dur(st.until - ms)
+                              + (dayKey(st.until) === dayKey(ms) ? "" : " · " + relDay(st.until, ms));
 
   var near = st.until - ms <= 20 * MIN || ms - st.since <= 20 * MIN;
   $("heroFlag").innerHTML = near
@@ -976,9 +940,22 @@ function renderStrip() {
     if (closed[i][2].t > a && closed[i][2].t < b)
       html += '<div class="hw" style="left:' + pct(closed[i][2].t).toFixed(3) + '%"></div>';
   }
-  var now = Date.now();
-  if (now >= a && now < b) html += '<div class="nowline" style="left:' + pct(now).toFixed(3) + '%"></div>';
-  $("track").innerHTML = html;
+  $("segs").innerHTML = html;
+
+  /* the faint "now" tick, and the handle showing what the hero is reading */
+  var now = Date.now(), nl = $("nowline"), sc = $("scrub");
+  if (now >= a && now < b) { nl.hidden = false; nl.style.left = pct(now).toFixed(3) + "%"; }
+  else nl.hidden = true;
+
+  var at = active();
+  if (at >= a && at < b) { sc.hidden = false; sc.style.left = pct(at).toFixed(3) + "%"; }
+  else sc.hidden = true;
+
+  var tr = $("track");
+  tr.setAttribute("aria-valuenow", Math.round((at - a) / MIN));
+  tr.setAttribute("aria-valuetext", (pinned === null ? "now, " : "") + hhmm(at) +
+    " — gates " + (stateAt(at).open ? "open" : "closed"));
+  $("nowBtn").hidden = (pinned === null);
 
   function seg(s, e, cls) {
     return '<div class="seg ' + cls + '" style="left:' + pct(s).toFixed(3) +
@@ -993,52 +970,64 @@ function renderStrip() {
           '">' + names[i] + "</span>";
   }
   $("axis").innerHTML = ax;
-
-  var hw = "";
-  for (i = 0; i < closed.length; i++) {
-    var t = closed[i][2];
-    if (t.t > a && t.t < b) hw += "";
-  }
-  $("hwrow").innerHTML = hw;
-}
-
-/* ---------- transitions ---------- */
-function renderTimeline() {
-  var ms = active(), list = transitionsAfter(ms, 6), html = "";
-  for (var i = 0; i < list.length; i++) {
-    var x = list[i];
-    html += '<div class="row" style="--st:' + (x.toOpen ? "var(--run)" : "var(--lock)") + '">' +
-              '<span class="pip"></span>' +
-              '<span class="what"><b>' + (x.toOpen ? "Gates open" : "Gates close") + "</b>" +
-                "<span>" + (x.toOpen ? "Current starts running" : "Lock passage begins") + "</span></span>" +
-              '<span class="when">' + hhmm(x.t) + "<small>" + relDay(x.t, ms) + " · in " + dur(x.t - ms) + "</small></span>" +
-            "</div>";
-  }
-  $("timeline").innerHTML = html || '<div class="row"><span></span><span class="what"><b>No further predictions</b><span>Beyond the embedded range.</span></span><span></span></div>';
 }
 
 function renderAll(){
-  renderHero(); renderStrip(); renderTimeline();
+  renderHero(); renderStrip();
   var ce = $("coverEnd");
   if (ce && COVER_B) ce.textContent = dayLabel(COVER_B) + ", " + nyParts(COVER_B).y;
 }
 
-/* ---------- controls ---------- */
-function pad(n){ return (n < 10 ? "0" : "") + n; }
-function toInput(ms){ var p = nyParts(ms); return p.y + "-" + pad(p.m) + "-" + pad(p.d) + "T" + pad(p.h) + ":" + pad(p.mi); }
-
-$("go").addEventListener("click", function(){
-  var v = $("pick").value;
-  var m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/.exec(v);
-  if (!m) return;
-  pinned = nyToMs(+m[1], +m[2], +m[3], +m[4], +m[5]);
-  dayAnchor = pinned;
+/* ---------- scrubbing ----------
+   Dragging the track is the only way to read another time. It replaced a date
+   field, a Check button, a Back-to-now button and a six-row list of upcoming
+   changes — the bar already showed all of that, so the list was the same data
+   twice and the form was a way of typing what you can point at. */
+function dayBounds() {
+  var p = nyParts(dayAnchor);
+  return [nyToMs(p.y, p.m, p.d, 0, 0), nyToMs(p.y, p.m, p.d + 1, 0, 0)];
+}
+function scrubTo(clientX) {
+  var tr = $("track"), r = tr.getBoundingClientRect();
+  if (!r.width) return;
+  var f = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
+  var bd = dayBounds();
+  pinned = Math.round((bd[0] + f * (bd[1] - bd[0])) / MIN) * MIN;
   renderAll();
-  document.getElementById("hero").scrollIntoView({ behavior: "smooth", block: "start" });
-});
-$("live").addEventListener("click", function(){
+}
+(function () {
+  var tr = $("track"), dragging = false;
+  tr.addEventListener("pointerdown", function (e) {
+    dragging = true;
+    tr.setPointerCapture(e.pointerId);
+    scrubTo(e.clientX);
+    e.preventDefault();
+  });
+  tr.addEventListener("pointermove", function (e) { if (dragging) scrubTo(e.clientX); });
+  function end(e) {
+    if (!dragging) return;
+    dragging = false;
+    try { tr.releasePointerCapture(e.pointerId); } catch (err) {}
+  }
+  tr.addEventListener("pointerup", end);
+  tr.addEventListener("pointercancel", end);
+
+  /* keyboard: same control, 15-minute steps, an hour with shift */
+  tr.addEventListener("keydown", function (e) {
+    var k = e.key, step = e.shiftKey ? 60 : 15, bd = dayBounds();
+    if (k !== "ArrowLeft" && k !== "ArrowRight" && k !== "Home" && k !== "End") return;
+    var at = pinned === null ? Date.now() : pinned;
+    if (at < bd[0] || at >= bd[1]) at = bd[0] + (bd[1] - bd[0]) / 2;
+    if (k === "Home") at = bd[0];
+    else if (k === "End") at = bd[1] - MIN;
+    else at += (k === "ArrowRight" ? step : -step) * MIN;
+    pinned = Math.min(bd[1] - MIN, Math.max(bd[0], Math.round(at / MIN) * MIN));
+    renderAll();
+    e.preventDefault();
+  });
+})();
+$("nowBtn").addEventListener("click", function () {
   pinned = null; dayAnchor = Date.now();
-  $("pick").value = toInput(Date.now());
   renderAll();
 });
 $("dayPrev").addEventListener("click", function(){ stepDay(-1); });
@@ -1046,7 +1035,13 @@ $("dayNext").addEventListener("click", function(){ stepDay(1); });
 function stepDay(k){
   var p = nyParts(dayAnchor);
   dayAnchor = nyToMs(p.y, p.m, p.d + k, 12, 0);
-  renderStrip();
+  /* carry the time of day across, so stepping days reads the same hour
+     instead of silently dropping the handle off the bar */
+  if (pinned !== null) {
+    var q = nyParts(pinned), r = nyParts(dayAnchor);
+    pinned = nyToMs(r.y, r.m, r.d, q.h, q.mi);
+  }
+  renderAll();
 }
 
 /* ---------- sponsor card on open ---------- */
@@ -1059,24 +1054,36 @@ function hideSplash() {
   el.className = "splash gone";
   setTimeout(function () { el.hidden = true; showDisclaimer(); }, 420);
 }
+/* Shown once per device, not once per launch. A boater pulling the phone out of
+   a jacket to ask one question should not have to dismiss a dialog first; the
+   warning line under the day strip is permanent and carries the same words. */
+var ACK_KEY = "shinnecock.locks.ack.v1";
+function seenDisclaimer() {
+  try { return localStorage.getItem(ACK_KEY) === "1"; } catch (e) { return false; }
+}
+function ackDisclaimer() {
+  try { localStorage.setItem(ACK_KEY, "1"); } catch (e) {}
+  $("disclaimer").hidden = true;
+}
 function showDisclaimer() {
   var d = $("disclaimer");
   if (!d || !d.hidden) return;
+  if (seenDisclaimer()) return;
   d.hidden = false;
   var ok = $("disclaimerOk");
   if (ok) ok.focus();
 }
 if ($("splash")) $("splash").addEventListener("click", hideSplash);
-$("disclaimerOk").addEventListener("click", function () { $("disclaimer").hidden = true; });
+$("disclaimerOk").addEventListener("click", ackDisclaimer);
 $("disclaimer").addEventListener("keydown", function (e) {
-  if (e.key === "Escape" || e.key === "Enter") $("disclaimer").hidden = true;
+  if (e.key === "Escape" || e.key === "Enter") ackDisclaimer();
 });
 /* dismiss once the data has settled, but hold it long enough to actually be seen */
 function splashReady() {
   setTimeout(hideSplash, Math.max(0, 1500 - (Date.now() - splashAt)));
 }
-setTimeout(hideSplash, 3400);   /* hard cap — never trap anyone behind it */
-if (!$("splash")) hideSplash();   /* straight to the notice when no sponsor is set */
+setTimeout(hideSplash, 3400);
+if (!$("splash")) hideSplash();   /* straight to the notice when no sponsor is set */   /* hard cap — never trap anyone behind it */
 
 /* ---------- boot ---------- */
 /* The webfont stylesheet is loaded as media="print" so it cannot block the
@@ -1098,9 +1105,8 @@ var usable = stored && stored.list.length &&
 setHT(usable ? stored.list : decodeSeed());
 
 dayAnchor = Date.now();
-$("pick").value = toInput(Date.now());
 renderAll();
-setInterval(function(){ if (pinned === null) { renderHero(); renderTimeline(); renderStrip(); } }, 30000);
+setInterval(function(){ if (pinned === null) renderAll(); }, 30000);
 
 fetchTides().then(function (list) {
   storeTides(list);
@@ -1126,8 +1132,8 @@ fetchTides().then(function (list) {
   var SAVED = "App shell saved to this device";
   if (!("serviceWorker" in navigator)) { say("This browser can't store the app shell.", false); return; }
   say(navigator.serviceWorker.controller ? SAVED : "Saving app shell\u2026", !!navigator.serviceWorker.controller);
-  /* When a newer worker takes over an already-running app, reload once so the
-     user sees the new version immediately instead of on their next launch. */
+  /* When a newer worker takes over a running app, reload once so the user sees
+     the new version now rather than on their next launch. */
   var hadController = !!navigator.serviceWorker.controller, reloaded = false;
   navigator.serviceWorker.addEventListener("controllerchange", function () {
     if (!hadController || reloaded) return;   /* never on a first-ever install */
