@@ -16,7 +16,7 @@ import re
 
 ROOT = pathlib.Path("/home/claude")
 OUT = ROOT / "gateclock"
-VERSION = "v21"
+VERSION = "v22"
 
 # Set SPONSOR_ENABLED = True to bring the opening card and credit line back.
 SPONSOR_ENABLED = False

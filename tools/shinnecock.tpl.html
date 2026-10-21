@@ -230,18 +230,28 @@ body{
   background:var(--card);border:1px solid var(--rule);border-radius:3px;
   padding:15px 15px 11px;display:flex;flex-direction:column;gap:9px;box-shadow:var(--shadow);
 }
-.stripnav{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.stripnav{display:flex;align-items:center;justify-content:space-between;gap:6px}
 .stripnav .day{
-  font-weight:600;font-size:17px;letter-spacing:-.01em;
-  flex:1;text-align:center;font-variant-numeric:tabular-nums;
+  font-family:inherit;font-weight:600;font-size:16.5px;letter-spacing:-.01em;
+  flex:1;min-width:0;display:flex;align-items:center;justify-content:center;gap:8px;
+  font-variant-numeric:tabular-nums;color:var(--ink);
+  background:transparent;border:none;border-radius:9px;padding:9px 6px;
+}
+.stripnav .day:hover{background:var(--sunk)}
+.stripnav .day:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.stripnav .day .cal{
+  width:17px;height:17px;flex:none;color:var(--ink-3);
+  fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;
 }
 button{font:inherit;cursor:pointer}
+/* Thumb-sized, because these get used one-handed on a moving boat. */
 .nav{
-  width:44px;height:36px;display:grid;place-items:center;padding:0;flex:none;
-  background:transparent;color:var(--ink-3);border:none;border-radius:8px;
-  font-size:13px;line-height:1;
+  width:52px;height:48px;display:grid;place-items:center;padding:0;flex:none;
+  background:var(--sunk);color:var(--ink-2);border:1px solid var(--rule);border-radius:11px;
 }
-.nav:hover{background:var(--sunk);color:var(--ink)}
+.nav svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.nav:hover{border-color:var(--rule-2);color:var(--ink)}
+.nav:active{background:var(--rule)}
 .nav:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
 
 /* The track IS the time control. Drag it and the hero follows — which is why
@@ -288,17 +298,74 @@ button{font:inherit;cursor:pointer}
   position:absolute;top:0;transform:translateX(-50%);
   font-family:"IBM Plex Mono",monospace;font-size:11.5px;color:var(--ink-3);white-space:nowrap;
 }
-.striprow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:8px;border-top:1px solid var(--rule)}
+.striprow{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-top:9px;border-top:1px solid var(--rule)}
 .key{display:flex;gap:14px;flex-wrap:wrap}
 .key i{display:flex;align-items:center;gap:6px;font-style:normal;font-size:12.5px;color:var(--ink-2)}
 .key i::before{content:"";width:11px;height:11px;border-radius:3px;background:var(--k);flex:none}
+
+/* One fixed-height row holds either the hint or the return button, so nothing
+   jumps under your thumb the moment you start scrubbing. */
+.nowrow{min-height:46px;display:flex;align-items:center;justify-content:center}
 .now{
-  flex:none;padding:7px 15px;border-radius:999px;font-size:13.5px;font-weight:600;
+  display:inline-flex;align-items:center;gap:9px;
+  padding:12px 26px;border-radius:999px;font-size:16px;font-weight:700;letter-spacing:-.01em;
   background:var(--accent);color:var(--paper);border:none;
+  box-shadow:0 2px 10px -2px rgba(0,0,0,.35);
 }
-.now:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.hint{margin:0;font-size:12px;line-height:1.4;color:var(--ink-3)}
+.now svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.now:active{filter:brightness(.92)}
+.now:focus-visible{outline:2px solid var(--focus);outline-offset:3px}
+.hint{margin:0;font-size:12px;line-height:1.4;color:var(--ink-3);text-align:center}
 .hint b{color:var(--ink-2);font-weight:500}
+
+/* ---------- month sheet ----------
+   Not just a date picker: every day carries its own open/closed pattern, so a
+   planner can see the window marching later each day and pick a date from the
+   shape rather than opening thirty of them one at a time. */
+.sheet{
+  position:fixed;inset:0;z-index:70;background:rgba(6,18,25,.55);
+  display:flex;align-items:flex-end;justify-content:center;padding:0;
+}
+.sheetCard{
+  background:var(--card);border-top:1px solid var(--rule);
+  border-radius:16px 16px 0 0;box-shadow:0 -6px 30px -8px rgba(0,0,0,.45);
+  width:100%;max-width:520px;padding:14px 15px calc(16px + env(safe-area-inset-bottom));
+  display:flex;flex-direction:column;gap:11px;
+}
+@media (min-width:560px){
+  .sheet{align-items:center;padding:20px}
+  .sheetCard{border-radius:16px;border:1px solid var(--rule)}
+}
+.calhead{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.caltitle{flex:1;text-align:center;font-weight:700;font-size:18px;letter-spacing:-.01em}
+.dow{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.dow span{
+  text-align:center;font-family:"IBM Plex Mono",monospace;font-size:11px;
+  letter-spacing:.08em;color:var(--ink-3);
+}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.cell{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  padding:8px 0 7px;border:1px solid transparent;border-radius:9px;
+  background:transparent;color:var(--ink);font-size:15px;font-weight:500;
+  font-variant-numeric:tabular-nums;line-height:1;
+}
+.cell .mini{width:76%;height:5px;border-radius:3px;background:var(--rule)}
+.cell:hover{background:var(--sunk)}
+.cell.sel{background:var(--sunk);border-color:var(--ink);font-weight:700}
+.cell.today{color:var(--accent);font-weight:700}
+.cell.out{visibility:hidden}
+.cell[disabled]{opacity:.3}
+.cell:focus-visible{outline:2px solid var(--focus);outline-offset:1px}
+.calnote{margin:0;font-size:12px;line-height:1.4;color:var(--ink-3)}
+.calnote b{color:var(--ink-2);font-weight:500}
+.calfoot{display:flex;gap:9px;justify-content:flex-end;padding-top:3px}
+.btn{
+  padding:11px 20px;background:var(--accent);color:var(--paper);border:1px solid var(--accent);
+  border-radius:9px;font-size:15.5px;font-weight:600;
+}
+.btn.ghost{background:transparent;color:var(--ink-2);border-color:var(--rule-2)}
+.btn:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
 
 /* ---------- notes ---------- */
 .notes{
@@ -461,9 +528,18 @@ button{font:inherit;cursor:pointer}
   <section class="sec">
     <div class="strip">
       <div class="stripnav">
-        <button class="nav" id="dayPrev" aria-label="Previous day">&#9664;</button>
-        <span class="day" id="stripDay">&mdash;</span>
-        <button class="nav" id="dayNext" aria-label="Next day">&#9654;</button>
+        <button class="nav" id="dayPrev" aria-label="Previous day">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 L8 12 L15 19"/></svg>
+        </button>
+        <button class="day" id="dayBtn" aria-haspopup="dialog">
+          <span id="stripDay">&mdash;</span>
+          <svg class="cal" viewBox="0 0 24 24" aria-hidden="true">
+            <rect x="3" y="5" width="18" height="16" rx="2.5"/><path d="M3 10h18M8 3v4M16 3v4"/>
+          </svg>
+        </button>
+        <button class="nav" id="dayNext" aria-label="Next day">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5 L16 12 L9 19"/></svg>
+        </button>
       </div>
       <div class="trackwrap">
         <span class="bubble" id="bubble" hidden aria-hidden="true">&mdash;</span>
@@ -476,16 +552,42 @@ button{font:inherit;cursor:pointer}
         </div>
       </div>
       <div class="axis" id="axis"></div>
+      <div class="nowrow">
+        <button class="now" id="nowBtn" hidden>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.6-5.9M4 4v4h4"/></svg>
+          Back to now
+        </button>
+        <p class="hint" id="stripHint">Drag the bar to read any time &middot; tap the date for a calendar</p>
+      </div>
       <div class="striprow">
         <span class="key">
           <i style="--k:var(--run)">Open &mdash; current running</i>
           <i style="--k:var(--lock)">Closed &mdash; lock passage</i>
         </span>
-        <button class="now" id="nowBtn" hidden>Now</button>
       </div>
-      <p class="hint" id="stripHint">Drag the bar to read any time. Predictions through <b id="coverEnd">&mdash;</b>.</p>
     </div>
   </section>
+
+  <div class="sheet" id="cal" hidden>
+    <div class="sheetCard" role="dialog" aria-modal="true" aria-labelledby="calTitle">
+      <div class="calhead">
+        <button class="nav" id="monPrev" aria-label="Previous month">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5 L8 12 L15 19"/></svg>
+        </button>
+        <span class="caltitle" id="calTitle">&mdash;</span>
+        <button class="nav" id="monNext" aria-label="Next month">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5 L16 12 L9 19"/></svg>
+        </button>
+      </div>
+      <div class="dow"><span>S</span><span>M</span><span>T</span><span>W</span><span>T</span><span>F</span><span>S</span></div>
+      <div class="grid" id="calGrid"></div>
+      <p class="calnote">Each day shows its own pattern of open and closed water. Predictions run through <b id="coverEnd">&mdash;</b>.</p>
+      <div class="calfoot">
+        <button class="btn ghost" id="calToday">Today</button>
+        <button class="btn" id="calClose">Done</button>
+      </div>
+    </div>
+  </div>
 
   <p class="warnline">Prediction only &mdash; not for navigation. Confirm on scene or on VHF&nbsp;13.</p>
 
@@ -627,7 +729,6 @@ function nyToMs(y, m, d, h, mi) {
 var FMT_T = new Intl.DateTimeFormat("en-US", { timeZone: TZ, hour: "numeric", minute: "2-digit" });
 var FMT_D = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short", month: "short", day: "numeric" });
 var FMT_W = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short" });
-var FMT_DY = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "long", month: "short", day: "numeric", year: "numeric" });
 function hhmm(ms) { return FMT_T.format(new Date(ms)).replace(/ /g, " "); }
 function dayLabel(ms) { return FMT_D.format(new Date(ms)); }
 function dayKey(ms) { var p = nyParts(ms); return p.y * 10000 + p.m * 100 + p.d; }
@@ -920,7 +1021,10 @@ function renderStrip() {
   var span = b - a;
   var pct = function(ms){ return ((ms - a) / span) * 100; };
 
-  $("stripDay").textContent = FMT_DY.format(new Date(a));
+  /* "Wed, Oct 21" fits one line beside the thumb-sized arrows; the year only
+     earns its place once you have planned your way out of this one. */
+  $("stripDay").textContent = dayLabel(a) +
+    (nyParts(a).y === nyParts(Date.now()).y ? "" : ", " + nyParts(a).y);
 
   /* closed windows overlapping the day */
   var closed = [], i;
@@ -955,7 +1059,9 @@ function renderStrip() {
   tr.setAttribute("aria-valuenow", Math.round((at - a) / MIN));
   tr.setAttribute("aria-valuetext", (pinned === null ? "now, " : "") + hhmm(at) +
     " — gates " + (stateAt(at).open ? "open" : "closed"));
-  $("nowBtn").hidden = (pinned === null);
+  var live = (pinned === null);
+  $("nowBtn").hidden = live;
+  $("stripHint").hidden = !live;
 
   function seg(s, e, cls) {
     return '<div class="seg ' + cls + '" style="left:' + pct(s).toFixed(3) +
@@ -1070,6 +1176,100 @@ $("nowBtn").addEventListener("click", function () {
   pinned = null; dayAnchor = Date.now();
   $("bubble").hidden = true;
   renderAll();
+});
+
+/* ---------- month sheet ---------- */
+var FMT_MON = new Intl.DateTimeFormat("en-US", { timeZone: TZ, month: "long", year: "numeric" });
+var calMonth = null;                      /* ms inside the displayed month */
+
+/* A day's whole pattern as one gradient — cheaper than thirty nested elements
+   and it is the thing that makes the calendar worth tapping. */
+function dayGradient(a, b) {
+  var span = b - a, stops = [], cur = a, i;
+  for (i = 0; i < HT.length; i++) {
+    var s = HT[i].t - BEFORE, e = HT[i].t + AFTER;
+    if (e <= a || s >= b) continue;
+    s = Math.max(s, a); e = Math.min(e, b);
+    if (s > cur) stops.push(["open", cur, s]);
+    stops.push(["closed", s, e]);
+    cur = e;
+  }
+  if (cur < b) stops.push(["open", cur, b]);
+  if (!stops.length) return "var(--rule)";
+  var parts = [];
+  for (i = 0; i < stops.length; i++) {
+    var c = stops[i][0] === "open" ? "var(--run)" : "var(--lock)";
+    parts.push(c + " " + (((stops[i][1] - a) / span) * 100).toFixed(2) + "% " +
+                         (((stops[i][2] - a) / span) * 100).toFixed(2) + "%");
+  }
+  return "linear-gradient(90deg," + parts.join(",") + ")";
+}
+
+function renderCal() {
+  var p = nyParts(calMonth);
+  $("calTitle").textContent = FMT_MON.format(new Date(nyToMs(p.y, p.m, 1, 12, 0)));
+
+  var first = nyToMs(p.y, p.m, 1, 12, 0);
+  var lead = nyWeekday(first);             /* weekday in Eastern, not the viewer's zone */
+  var days = nyParts(nyToMs(p.y, p.m + 1, 0, 12, 0)).d;
+  var selKey = dayKey(dayAnchor), todayKey = dayKey(Date.now());
+
+  var html = "", i;
+  for (i = 0; i < lead; i++) html += '<button class="cell out" disabled></button>';
+  for (i = 1; i <= days; i++) {
+    var a = nyToMs(p.y, p.m, i, 0, 0), b = nyToMs(p.y, p.m, i + 1, 0, 0);
+    var k = nyParts(a).y * 10000 + nyParts(a).m * 100 + nyParts(a).d;
+    var usable = b > COVER_A && a < COVER_B;
+    html += '<button class="cell' + (k === selKey ? " sel" : "") +
+            (k === todayKey ? " today" : "") + '" data-d="' + i + '"' +
+            (usable ? "" : " disabled") + '>' + i +
+            '<span class="mini" style="background:' + (usable ? dayGradient(a, b) : "var(--rule)") + '"></span>' +
+            "</button>";
+  }
+  $("calGrid").innerHTML = html;
+}
+function nyWeekday(ms) {
+  var s = new Intl.DateTimeFormat("en-US", { timeZone: TZ, weekday: "short" }).format(new Date(ms));
+  return ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].indexOf(s);
+}
+function openCal() {
+  calMonth = dayAnchor;
+  renderCal();
+  $("cal").hidden = false;
+  $("calClose").focus();
+}
+function closeCal() { $("cal").hidden = true; $("dayBtn").focus(); }
+function goToDay(y, m, d) {
+  var hour = pinned === null ? null : nyParts(pinned);
+  dayAnchor = nyToMs(y, m, d, 12, 0);
+  if (hour) pinned = snap(nyToMs(y, m, d, hour.h, hour.mi));
+  renderAll();
+  if (pinned !== null) { previewAt(pinned); fadeBubble(); }
+}
+$("dayBtn").addEventListener("click", openCal);
+$("calClose").addEventListener("click", closeCal);
+$("calToday").addEventListener("click", function () {
+  pinned = null; dayAnchor = Date.now();
+  $("bubble").hidden = true;
+  renderAll(); closeCal();
+});
+$("monPrev").addEventListener("click", function () { stepMonth(-1); });
+$("monNext").addEventListener("click", function () { stepMonth(1); });
+function stepMonth(k) {
+  var p = nyParts(calMonth), t = nyToMs(p.y, p.m + k, 1, 12, 0);
+  if (t > COVER_B + 31 * 864e5 || t < COVER_A - 31 * 864e5) return;
+  calMonth = t; renderCal();
+}
+$("calGrid").addEventListener("click", function (e) {
+  var btn = e.target.closest ? e.target.closest(".cell") : null;
+  if (!btn || btn.disabled || !btn.getAttribute("data-d")) return;
+  var p = nyParts(calMonth);
+  goToDay(p.y, p.m, +btn.getAttribute("data-d"));
+  closeCal();
+});
+$("cal").addEventListener("click", function (e) { if (e.target === $("cal")) closeCal(); });
+document.addEventListener("keydown", function (e) {
+  if (e.key === "Escape" && !$("cal").hidden) closeCal();
 });
 $("dayPrev").addEventListener("click", function(){ stepDay(-1); });
 $("dayNext").addEventListener("click", function(){ stepDay(1); });
