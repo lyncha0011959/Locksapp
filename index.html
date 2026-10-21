@@ -262,12 +262,32 @@ button{font:inherit;cursor:pointer}
 
 /* The track IS the time control. Drag it and the hero follows — which is why
    there is no date field, no Check button and no list of next changes. */
+.trackwrap{position:relative;padding-top:30px}
+.bubble{
+  position:absolute;top:0;transform:translateX(-50%);pointer-events:none;z-index:2;
+  font-family:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  font-size:13.5px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.01em;
+  background:var(--ink);color:var(--card);padding:4px 10px;border-radius:7px;white-space:nowrap;
+  box-shadow:0 2px 8px rgba(0,0,0,.28);opacity:1;transition:opacity .3s ease .5s;
+}
+/* The tail tracks the handle even when the label itself has been nudged inboard
+   to stay on the card, so near midnight it still points at the right place. */
+.bubble::after{
+  content:"";position:absolute;left:calc(50% + var(--tailx,0px));bottom:-4px;
+  transform:translateX(-50%);
+  border-left:5px solid transparent;border-right:5px solid transparent;
+  border-top:5px solid var(--ink);
+}
+.bubble.fade{opacity:0}
+/* The bands are clipped to the rounded rect, but the track itself is not — the
+   handle has to be able to sit on the very first and last minute of the day
+   without losing half of itself to the corner radius. */
 .track{
-  position:relative;height:58px;border-radius:10px;overflow:hidden;background:var(--sunk);
+  position:relative;height:58px;border-radius:10px;background:var(--sunk);
   touch-action:none;cursor:ew-resize;user-select:none;-webkit-user-select:none;
 }
 .track:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.segs{position:absolute;inset:0}
+.segs{position:absolute;inset:0;border-radius:10px;overflow:hidden}
 .seg{position:absolute;top:0;bottom:0}
 .seg.open{background:var(--run)}
 .seg.closed{background:var(--lock)}
@@ -465,12 +485,15 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
         <span class="day" id="stripDay">&mdash;</span>
         <button class="nav" id="dayNext" aria-label="Next day">&#9654;</button>
       </div>
-      <div class="track" id="track" tabindex="0" role="slider"
-           aria-label="Drag to read the gates at any time of day"
-           aria-valuemin="0" aria-valuemax="1439" aria-valuenow="0" aria-valuetext="now">
-        <div class="segs" id="segs"></div>
-        <div class="nowline" id="nowline" hidden></div>
-        <div class="scrub" id="scrub" hidden><b></b></div>
+      <div class="trackwrap">
+        <span class="bubble" id="bubble" hidden aria-hidden="true">&mdash;</span>
+        <div class="track" id="track" tabindex="0" role="slider"
+             aria-label="Drag to read the gates at any time of day"
+             aria-valuemin="0" aria-valuemax="1439" aria-valuenow="0" aria-valuetext="now">
+          <div class="segs" id="segs"></div>
+          <div class="nowline" id="nowline" hidden></div>
+          <div class="scrub" id="scrub" hidden><b></b></div>
+        </div>
       </div>
       <div class="axis" id="axis"></div>
       <div class="striprow">
@@ -518,7 +541,7 @@ body{padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bot
   </section>
 
   <footer class="foot">
-    <span>Shinnecock Locks &middot; Locks Open? v20</span>
+    <span>Shinnecock Locks &middot; Locks Open? v21</span>
     <span id="swstate">Checking device storage&hellip;</span>
   </footer>
 
@@ -987,47 +1010,88 @@ function dayBounds() {
   var p = nyParts(dayAnchor);
   return [nyToMs(p.y, p.m, p.d, 0, 0), nyToMs(p.y, p.m, p.d + 1, 0, 0)];
 }
-function scrubTo(clientX) {
+var STEP = 15 * MIN;                      /* you plan a transit to the quarter hour */
+var dragging = false, bubbleTimer = null;
+
+function clampDay(ms) {
+  var bd = dayBounds();
+  return Math.min(bd[1] - STEP, Math.max(bd[0], ms));
+}
+function snap(ms) { return clampDay(Math.round(ms / STEP) * STEP); }
+
+/* Move the handle and show the time you are about to land on, WITHOUT touching
+   the hero. Everything above the bar stays frozen on the last committed time,
+   so the 20-minute flag and the current wording don't strobe as you drag. */
+function previewAt(ms) {
+  var bd = dayBounds(), f = (ms - bd[0]) / (bd[1] - bd[0]);
+  var sc = $("scrub"), bub = $("bubble"), tr = $("track");
+  sc.hidden = false; sc.style.left = (f * 100).toFixed(3) + "%";
+
+  bub.hidden = false;
+  bub.classList.remove("fade");
+  bub.textContent = hhmm(ms);
+  /* place it in pixels so the label can be nudged back onto the card while the
+     tail keeps pointing at the handle */
+  var w = tr.offsetWidth, bw = bub.offsetWidth, x = f * w;
+  var left = Math.min(w - bw / 2, Math.max(bw / 2, x));
+  bub.style.left = left.toFixed(1) + "px";
+  bub.style.setProperty("--tailx", (x - left).toFixed(1) + "px");
+  if (bubbleTimer) { clearTimeout(bubbleTimer); bubbleTimer = null; }
+}
+function fadeBubble() {
+  if (bubbleTimer) clearTimeout(bubbleTimer);
+  $("bubble").classList.add("fade");
+  bubbleTimer = setTimeout(function () { $("bubble").hidden = true; }, 900);
+}
+function timeAtX(clientX) {
   var tr = $("track"), r = tr.getBoundingClientRect();
-  if (!r.width) return;
+  if (!r.width) return null;
   var f = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
   var bd = dayBounds();
-  pinned = Math.round((bd[0] + f * (bd[1] - bd[0])) / MIN) * MIN;
-  renderAll();
+  return snap(bd[0] + f * (bd[1] - bd[0]));
 }
 (function () {
-  var tr = $("track"), dragging = false;
+  var tr = $("track"), at = null;
   tr.addEventListener("pointerdown", function (e) {
-    dragging = true;
+    var t = timeAtX(e.clientX);
+    if (t === null) return;
+    dragging = true; at = t;
     tr.setPointerCapture(e.pointerId);
-    scrubTo(e.clientX);
+    previewAt(at);
     e.preventDefault();
   });
-  tr.addEventListener("pointermove", function (e) { if (dragging) scrubTo(e.clientX); });
+  tr.addEventListener("pointermove", function (e) {
+    if (!dragging) return;
+    var t = timeAtX(e.clientX);
+    if (t !== null && t !== at) { at = t; previewAt(at); }
+  });
   function end(e) {
     if (!dragging) return;
     dragging = false;
     try { tr.releasePointerCapture(e.pointerId); } catch (err) {}
+    if (at !== null) { pinned = at; renderAll(); previewAt(at); fadeBubble(); }
   }
   tr.addEventListener("pointerup", end);
   tr.addEventListener("pointercancel", end);
 
-  /* keyboard: same control, 15-minute steps, an hour with shift */
+  /* keyboard: same control, same quarter-hour grid, an hour with shift */
   tr.addEventListener("keydown", function (e) {
-    var k = e.key, step = e.shiftKey ? 60 : 15, bd = dayBounds();
+    var k = e.key, step = e.shiftKey ? 4 * STEP : STEP, bd = dayBounds();
     if (k !== "ArrowLeft" && k !== "ArrowRight" && k !== "Home" && k !== "End") return;
-    var at = pinned === null ? Date.now() : pinned;
-    if (at < bd[0] || at >= bd[1]) at = bd[0] + (bd[1] - bd[0]) / 2;
-    if (k === "Home") at = bd[0];
-    else if (k === "End") at = bd[1] - MIN;
-    else at += (k === "ArrowRight" ? step : -step) * MIN;
-    pinned = Math.min(bd[1] - MIN, Math.max(bd[0], Math.round(at / MIN) * MIN));
+    var t = pinned === null ? Date.now() : pinned;
+    if (t < bd[0] || t >= bd[1]) t = bd[0] + (bd[1] - bd[0]) / 2;
+    if (k === "Home") t = bd[0];
+    else if (k === "End") t = bd[1] - STEP;
+    else t += (k === "ArrowRight" ? step : -step);
+    pinned = snap(t);
     renderAll();
+    previewAt(pinned); fadeBubble();
     e.preventDefault();
   });
 })();
 $("nowBtn").addEventListener("click", function () {
   pinned = null; dayAnchor = Date.now();
+  $("bubble").hidden = true;
   renderAll();
 });
 $("dayPrev").addEventListener("click", function(){ stepDay(-1); });
@@ -1039,9 +1103,10 @@ function stepDay(k){
      instead of silently dropping the handle off the bar */
   if (pinned !== null) {
     var q = nyParts(pinned), r = nyParts(dayAnchor);
-    pinned = nyToMs(r.y, r.m, r.d, q.h, q.mi);
+    pinned = snap(nyToMs(r.y, r.m, r.d, q.h, q.mi));
   }
   renderAll();
+  if (pinned !== null) { previewAt(pinned); fadeBubble(); }
 }
 
 /* ---------- sponsor card on open ---------- */
@@ -1106,7 +1171,7 @@ setHT(usable ? stored.list : decodeSeed());
 
 dayAnchor = Date.now();
 renderAll();
-setInterval(function(){ if (pinned === null) renderAll(); }, 30000);
+setInterval(function(){ if (pinned === null && !dragging) renderAll(); }, 30000);
 
 fetchTides().then(function (list) {
   storeTides(list);
